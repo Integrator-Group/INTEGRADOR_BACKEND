@@ -1,5 +1,5 @@
 import { CantonsRepository } from '../repositories/cantonsRepository';
-import { Cantons, CantonsCreate, CantonsUpdate } from '../models/Cantons';
+import { Canton, CantonCreate, CantonUpdate } from '../models/Cantons';
 
 export class CantonsService {
   private readonly cantonsRepository: CantonsRepository;
@@ -8,11 +8,11 @@ export class CantonsService {
     this.cantonsRepository = new CantonsRepository();
   }
 
-  async getAllCantons(): Promise<Cantons[]> {
+  async getAllCantons(): Promise<Canton[]> {
     return this.cantonsRepository.findAll();
   }
 
-  async getCantonById(id: number): Promise<Cantons> {
+  async getCantonById(id: number): Promise<Canton> {
     const canton = await this.cantonsRepository.findById(id);
     if (!canton) {
       throw new Error('Cantón no encontrado');
@@ -20,36 +20,50 @@ export class CantonsService {
     return canton;
   }
 
-  async getCantonsByProvince(id_province: number): Promise<Cantons[]> {
+  async getCantonsByProvince(id_province: number): Promise<Canton[]> {
     return this.cantonsRepository.findByProvince(id_province);
   }
 
-  async createCanton(cantonData: CantonsCreate): Promise<Cantons> {
-    const existingCanton = await this.cantonsRepository.findByName(cantonData.name);
-    if (existingCanton) {
-      throw new Error('El nombre del cantón ya existe');
-    }
-    return this.cantonsRepository.create(cantonData);
-  }
-
-  async updateCanton(id: number, cantonData: CantonsUpdate): Promise<Cantons> {
-    const canton = await this.cantonsRepository.findById(id);
-    if (!canton) {
-      throw new Error('Cantón no encontrado');
-    }
-
-    if (cantonData.name && cantonData.name !== canton.name) {
-      const repeatedCanton = await this.cantonsRepository.findByName(cantonData.name);
-      if (repeatedCanton) {
+  async createCanton(cantonData: CantonCreate): Promise<Canton> {
+    try {
+      const existingCanton = await this.cantonsRepository.findByName(cantonData.name);
+      if (existingCanton) {
         throw new Error('El nombre del cantón ya existe');
       }
+      return await this.cantonsRepository.create(cantonData);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'El nombre del cantón ya existe') {
+        throw error;
+      }
+      throw new Error('Error al crear el cantón: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
+  }
 
-    const updatedCanton = await this.cantonsRepository.update(id, cantonData);
-    if (!updatedCanton) {
-      throw new Error('Error al actualizar el cantón');
+  async updateCanton(id: number, cantonData: CantonUpdate): Promise<Canton> {
+    try {
+      const canton = await this.cantonsRepository.findById(id);
+      if (!canton) {
+        throw new Error('Cantón no encontrado');
+      }
+
+      if (cantonData.name && cantonData.name !== canton.name) {
+        const repeatedCanton = await this.cantonsRepository.findByName(cantonData.name);
+        if (repeatedCanton) {
+          throw new Error('El nombre del cantón ya existe');
+        }
+      }
+
+      const updatedCanton = await this.cantonsRepository.update(id, cantonData);
+      if (!updatedCanton) {
+        throw new Error('Error al actualizar el cantón');
+      }
+      return updatedCanton;
+    } catch (error) {
+      if (error instanceof Error && (error.message === 'Cantón no encontrado' || error.message === 'El nombre del cantón ya existe')) {
+        throw error;
+      }
+      throw new Error('Error al actualizar el cantón: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
-    return updatedCanton;
   }
 
   async deleteCanton(id: number): Promise<void> {

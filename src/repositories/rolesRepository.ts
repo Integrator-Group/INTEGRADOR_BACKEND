@@ -1,11 +1,11 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { Roles, RolesCreate, RolesUpdate } from '../models/Roles';
+import { Role, RoleCreate, RoleUpdate } from '../models/Roles';
 
 export class RolesRepository {
     private readonly tableName = 'roles';
 
-    async findAll(): Promise<Roles[]> {
+    async findAll(): Promise<Role[]> {
         const [rows] = await pool.execute<any[]>(
             `SELECT r.id, r.name, r.id_state, gs.name AS state_name
              FROM ${this.tableName} r
@@ -15,7 +15,7 @@ export class RolesRepository {
         return rows;
     }
 
-    async findById(id: number): Promise<Roles | null> {
+    async findById(id: number): Promise<Role | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT r.id, r.name, r.id_state, gs.name AS state_name
              FROM ${this.tableName} r
@@ -26,7 +26,7 @@ export class RolesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByName(name: string): Promise<Roles | null> {
+    async findByName(name: string): Promise<Role | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT name
              FROM ${this.tableName}
@@ -36,7 +36,7 @@ export class RolesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async create(role: RolesCreate): Promise<Roles> {
+    async create(role: RoleCreate): Promise<Role> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `INSERT INTO ${this.tableName} (name, id_state, created_at) VALUES (?, ?, NOW())`,
             [role.name, role.id_state]
@@ -49,7 +49,7 @@ export class RolesRepository {
         return newRole;
     }
 
-    async update(id: number, role: RolesUpdate): Promise<Roles | null> {
+    async update(id: number, role: RoleUpdate): Promise<Role | null> {
         const updates: string[] = [];
         const values: any[] = [];
 

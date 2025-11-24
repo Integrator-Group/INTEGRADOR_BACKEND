@@ -1,4 +1,4 @@
-export interface Provinces {
+export interface Province {
     id?: number;
     name: string;
     id_state: number;
@@ -8,12 +8,12 @@ export interface Provinces {
     deleted_at?: Date;
 }
 
-export interface ProvincesCreate {
+export interface ProvinceCreate {
     name: string;
     id_state: number;
 }
 
-export interface ProvincesUpdate {
+export interface ProvinceUpdate {
     name?: string;
     id_state?: number;
 }

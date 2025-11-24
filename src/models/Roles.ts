@@ -1,4 +1,4 @@
-export interface Roles {
+export interface Role {
     id?: number;
     name: string;
     id_state: number;
@@ -8,12 +8,12 @@ export interface Roles {
     deleted_at?: Date;
 }
 
-export interface RolesCreate {
+export interface RoleCreate {
     name: string;
     id_state: number;
 }
 
-export interface RolesUpdate {
+export interface RoleUpdate {
     name?: string;
     id_state?: number;
 }

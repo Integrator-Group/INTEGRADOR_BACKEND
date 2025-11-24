@@ -1,4 +1,4 @@
-export interface Cantons {
+export interface Canton {
     id?: number;
     name: string;
     id_province: number;
@@ -9,13 +9,13 @@ export interface Cantons {
     deleted_at?: Date;
 }
 
-export interface CantonsCreate {
+export interface CantonCreate {
     name: string;
     id_province: number;
     id_state: number;
 }
 
-export interface CantonsUpdate {
+export interface CantonUpdate {
     name?: string;
     id_province?: number;
     id_state?: number;

@@ -1,5 +1,5 @@
 import { PaymentMethodsRepository } from '../repositories/paymentMethodsRepository';
-import { PaymentMethods, PaymentMethodsCreate, PaymentMethodsUpdate } from '../models/Payment_Methods';
+import { PaymentMethod, PaymentMethodCreate, PaymentMethodUpdate } from '../models/Payment_Methods';
 
 export class PaymentMethodsService {
     private paymentMethodsRepository: PaymentMethodsRepository;
@@ -8,11 +8,11 @@ export class PaymentMethodsService {
         this.paymentMethodsRepository = new PaymentMethodsRepository();
     }
 
-    async getAllPaymentMethods(): Promise<PaymentMethods[]> {
+    async getAllPaymentMethods(): Promise<PaymentMethod[]> {
         return await this.paymentMethodsRepository.findAll();
     }
     
-    async getPaymentMethodById(id: number): Promise<PaymentMethods> {
+    async getPaymentMethodById(id: number): Promise<PaymentMethod> {
         const paymentMethod = await this.paymentMethodsRepository.findById(id);
         if (!paymentMethod) {
             throw new Error('Método de pago no encontrado');
@@ -20,24 +20,38 @@ export class PaymentMethodsService {
         return paymentMethod;
     }
 
-    async createPaymentMethod(paymentMethod: PaymentMethodsCreate): Promise<PaymentMethods> {
-        const paymentMethodExistente = await this.paymentMethodsRepository.findByName(paymentMethod.name);
-        if (paymentMethodExistente) {
-            throw new Error('El nombre del método de pago ya existe');
+    async createPaymentMethod(paymentMethod: PaymentMethodCreate): Promise<PaymentMethod> {
+        try {
+            const paymentMethodExistente = await this.paymentMethodsRepository.findByName(paymentMethod.name);
+            if (paymentMethodExistente) {
+                throw new Error('El nombre del método de pago ya existe');
+            }
+            return await this.paymentMethodsRepository.create(paymentMethod);
+        } catch (error) {
+            if (error instanceof Error && error.message === 'El nombre del método de pago ya existe') {
+                throw error;
+            }
+            throw new Error('Error al crear el método de pago: ' + (error instanceof Error ? error.message : 'Error desconocido'));
         }
-        return await this.paymentMethodsRepository.create(paymentMethod);
     }
 
-    async updatePaymentMethod(id: number, paymentMethod: PaymentMethodsUpdate): Promise<PaymentMethods> {
-        const paymentMethodExistente = await this.paymentMethodsRepository.findById(id);
-        if (!paymentMethodExistente) {
-            throw new Error('Método de pago no encontrado');
+    async updatePaymentMethod(id: number, paymentMethod: PaymentMethodUpdate): Promise<PaymentMethod> {
+        try {
+            const paymentMethodExistente = await this.paymentMethodsRepository.findById(id);
+            if (!paymentMethodExistente) {
+                throw new Error('Método de pago no encontrado');
+            }
+            const paymentMethodActualizado = await this.paymentMethodsRepository.update(id, paymentMethod);
+            if (!paymentMethodActualizado) {
+                throw new Error('Error al actualizar el método de pago');
+            }
+            return paymentMethodActualizado;
+        } catch (error) {
+            if (error instanceof Error && (error.message === 'Método de pago no encontrado' || error.message === 'El nombre del método de pago ya existe')) {
+                throw error;
+            }
+            throw new Error('Error al actualizar el método de pago: ' + (error instanceof Error ? error.message : 'Error desconocido'));
         }
-        const paymentMethodActualizado = await this.paymentMethodsRepository.update(id, paymentMethod);
-        if (!paymentMethodActualizado) {
-            throw new Error('Error al actualizar el método de pago');
-        }
-        return paymentMethodActualizado;
     }
     
     async deletePaymentMethod(id: number): Promise<void> {

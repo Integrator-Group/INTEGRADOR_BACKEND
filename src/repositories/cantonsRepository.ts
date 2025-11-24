@@ -1,11 +1,11 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { Cantons, CantonsCreate, CantonsUpdate } from '../models/Cantons';
+import { Canton, CantonCreate, CantonUpdate } from '../models/Cantons';
 
 export class CantonsRepository {
     private readonly tableName = 'cantons';
 
-    async findAll(): Promise<Cantons[]> {
+    async findAll(): Promise<Canton[]> {
         const [rows] = await pool.execute<any[]>(
             `SELECT c.id, c.name, c.id_province, c.id_state, gs.name AS state_name
              FROM ${this.tableName} c
@@ -15,7 +15,7 @@ export class CantonsRepository {
         return rows;
     }
 
-    async findById(id: number): Promise<Cantons | null> {
+    async findById(id: number): Promise<Canton | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT c.id, c.name, c.id_province, c.id_state, gs.name AS state_name
              FROM ${this.tableName} c
@@ -26,7 +26,7 @@ export class CantonsRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByName(name: string): Promise<Cantons | null> {
+    async findByName(name: string): Promise<Canton | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT name
              FROM ${this.tableName}
@@ -36,7 +36,7 @@ export class CantonsRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByProvince(id_province: number): Promise<Cantons[]> {
+    async findByProvince(id_province: number): Promise<Canton[]> {
         const [rows] = await pool.execute<any[]>(
             `SELECT c.id, c.name, c.id_province, c.id_state, gs.name AS state_name
              FROM ${this.tableName} c
@@ -47,7 +47,7 @@ export class CantonsRepository {
         return rows;
     }
 
-    async create(canton: CantonsCreate): Promise<Cantons> {
+    async create(canton: CantonCreate): Promise<Canton> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `INSERT INTO ${this.tableName} (name, id_province, id_state, created_at) VALUES (?, ?, ?, NOW())`,
             [canton.name, canton.id_province, canton.id_state]
@@ -60,7 +60,7 @@ export class CantonsRepository {
         return newCanton;
     }
 
-    async update(id: number, canton: CantonsUpdate): Promise<Cantons | null> {
+    async update(id: number, canton: CantonUpdate): Promise<Canton | null> {
         const updates: string[] = [];
         const values: any[] = [];
 

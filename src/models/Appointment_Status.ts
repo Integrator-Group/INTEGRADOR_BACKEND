@@ -1,4 +1,4 @@
-export interface AppointmentStatus {
+export interface AppointmentState {
     id?: number;
     name: string;
     id_state: number;
@@ -8,12 +8,12 @@ export interface AppointmentStatus {
     deleted_at?: Date;
 }
 
-export interface AppointmentStatusCreate {
+export interface AppointmentStateCreate {
     name: string;
     id_state: number;
 }
 
-export interface AppointmentStatusUpdate {
+export interface AppointmentStateUpdate {
     name?: string;
     id_state?: number;
 }

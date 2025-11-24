@@ -1,11 +1,11 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { Provinces, ProvincesCreate, ProvincesUpdate } from '../models/Provinces';
+import { Province, ProvinceCreate, ProvinceUpdate } from '../models/Provinces';
 
 export class ProvincesRepository {
     private readonly tableName = 'provinces';
 
-    async findAll(): Promise<Provinces[]> {
+    async findAll(): Promise<Province[]> {
         const [rows] = await pool.execute<any[]>(
             `SELECT p.id, p.name, p.id_state, gs.name AS state_name
              FROM ${this.tableName} p
@@ -15,7 +15,7 @@ export class ProvincesRepository {
         return rows;
     }
 
-    async findById(id: number): Promise<Provinces | null> {
+    async findById(id: number): Promise<Province | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT p.id, p.name, p.id_state, gs.name AS state_name
              FROM ${this.tableName} p
@@ -26,7 +26,7 @@ export class ProvincesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByName(name: string): Promise<Provinces | null> {
+    async findByName(name: string): Promise<Province | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT name
              FROM ${this.tableName}
@@ -36,7 +36,7 @@ export class ProvincesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async create(province: ProvincesCreate): Promise<Provinces> {
+    async create(province: ProvinceCreate): Promise<Province> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `INSERT INTO ${this.tableName} (name, id_state, created_at) VALUES (?, ?, NOW())`,
             [province.name, province.id_state]
@@ -49,7 +49,7 @@ export class ProvincesRepository {
         return newProvince;
     }
 
-    async update(id: number, province: ProvincesUpdate): Promise<Provinces | null> {
+    async update(id: number, province: ProvinceUpdate): Promise<Province | null> {
         const updates: string[] = [];
         const values: any[] = [];
 

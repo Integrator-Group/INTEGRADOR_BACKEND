@@ -1,5 +1,5 @@
 import { ProvincesRepository } from '../repositories/provincesRepository';
-import { Provinces, ProvincesCreate, ProvincesUpdate } from '../models/Provinces';
+import { Province, ProvinceCreate, ProvinceUpdate } from '../models/Provinces';
 
 export class ProvincesService {
   private readonly provincesRepository: ProvincesRepository;
@@ -8,11 +8,11 @@ export class ProvincesService {
     this.provincesRepository = new ProvincesRepository();
   }
 
-  async getAllProvinces(): Promise<Provinces[]> {
+  async getAllProvinces(): Promise<Province[]> {
     return this.provincesRepository.findAll();
   }
 
-  async getProvinceById(id: number): Promise<Provinces> {
+  async getProvinceById(id: number): Promise<Province> {
     const province = await this.provincesRepository.findById(id);
     if (!province) {
       throw new Error('Provincia no encontrada');
@@ -20,32 +20,46 @@ export class ProvincesService {
     return province;
   }
 
-  async createProvince(provinceData: ProvincesCreate): Promise<Provinces> {
-    const existingProvince = await this.provincesRepository.findByName(provinceData.name);
-    if (existingProvince) {
-      throw new Error('El nombre de la provincia ya existe');
-    }
-    return this.provincesRepository.create(provinceData);
-  }
-
-  async updateProvince(id: number, provinceData: ProvincesUpdate): Promise<Provinces> {
-    const province = await this.provincesRepository.findById(id);
-    if (!province) {
-      throw new Error('Provincia no encontrada');
-    }
-
-    if (provinceData.name && provinceData.name !== province.name) {
-      const repeatedProvince = await this.provincesRepository.findByName(provinceData.name);
-      if (repeatedProvince) {
+  async createProvince(provinceData: ProvinceCreate): Promise<Province> {
+    try {
+      const existingProvince = await this.provincesRepository.findByName(provinceData.name);
+      if (existingProvince) {
         throw new Error('El nombre de la provincia ya existe');
       }
+      return await this.provincesRepository.create(provinceData);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'El nombre de la provincia ya existe') {
+        throw error;
+      }
+      throw new Error('Error al crear la provincia: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
+  }
 
-    const updatedProvince = await this.provincesRepository.update(id, provinceData);
-    if (!updatedProvince) {
-      throw new Error('Error al actualizar la provincia');
+  async updateProvince(id: number, provinceData: ProvinceUpdate): Promise<Province> {
+    try {
+      const province = await this.provincesRepository.findById(id);
+      if (!province) {
+        throw new Error('Provincia no encontrada');
+      }
+
+      if (provinceData.name && provinceData.name !== province.name) {
+        const repeatedProvince = await this.provincesRepository.findByName(provinceData.name);
+        if (repeatedProvince) {
+          throw new Error('El nombre de la provincia ya existe');
+        }
+      }
+
+      const updatedProvince = await this.provincesRepository.update(id, provinceData);
+      if (!updatedProvince) {
+        throw new Error('Error al actualizar la provincia');
+      }
+      return updatedProvince;
+    } catch (error) {
+      if (error instanceof Error && (error.message === 'Provincia no encontrada' || error.message === 'El nombre de la provincia ya existe')) {
+        throw error;
+      }
+      throw new Error('Error al actualizar la provincia: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
-    return updatedProvince;
   }
 
   async deleteProvince(id: number): Promise<void> {

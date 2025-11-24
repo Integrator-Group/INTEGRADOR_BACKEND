@@ -1,11 +1,11 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { AppointmentStatus, AppointmentStatusCreate, AppointmentStatusUpdate } from '../models/Appointment_Status';
+import { AppointmentState, AppointmentStateCreate, AppointmentStateUpdate } from '../models/Appointment_Status';
 
 export class AppointmentStatusRepository {
     private readonly tableName = 'appointment_status';
 
-    async findAll(): Promise<AppointmentStatus[]> {
+    async findAll(): Promise<AppointmentState[]> {
         const [rows] = await pool.execute<any[]>(
             `SELECT ap.id, ap.name, ap.id_state, gs.name AS state_name
              FROM ${this.tableName} ap
@@ -15,7 +15,7 @@ export class AppointmentStatusRepository {
         return rows;
     }
 
-    async findById(id: number): Promise<AppointmentStatus | null> {
+    async findById(id: number): Promise<AppointmentState | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT ap.id, ap.name, ap.id_state, gs.name AS state_name
              FROM ${this.tableName} ap
@@ -26,7 +26,7 @@ export class AppointmentStatusRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByName(name: string): Promise<AppointmentStatus | null> {
+    async findByName(name: string): Promise<AppointmentState | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT name 
              FROM ${this.tableName}
@@ -36,7 +36,7 @@ export class AppointmentStatusRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async create(appointmentStatus: AppointmentStatusCreate): Promise<AppointmentStatus> {
+    async create(appointmentStatus: AppointmentStateCreate): Promise<AppointmentState> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `INSERT INTO ${this.tableName} (name, id_state, created_at) VALUES (?, ?, NOW())`,
             [appointmentStatus.name, appointmentStatus.id_state]
@@ -49,7 +49,7 @@ export class AppointmentStatusRepository {
         return newAppointmentStatus;
     }
 
-    async update(id: number, appointmentStatus: AppointmentStatusUpdate): Promise<AppointmentStatus | null> {
+    async update(id: number, appointmentStatus: AppointmentStateUpdate): Promise<AppointmentState | null> {
         const updates: string[] = [];
         const values: any[] = [];
 
