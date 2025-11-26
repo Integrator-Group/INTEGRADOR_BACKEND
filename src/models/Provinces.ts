@@ -1,4 +1,4 @@
-export interface AppointmentState {
+export interface Province {
     id?: number;
     name: string;
     id_state: number;
@@ -8,12 +8,13 @@ export interface AppointmentState {
     deleted_at?: Date;
 }
 
-export interface AppointmentStateCreate {
+export interface ProvinceCreate {
     name: string;
     id_state: number;
 }
 
-export interface AppointmentStateUpdate {
+export interface ProvinceUpdate {
     name?: string;
     id_state?: number;
 }
+

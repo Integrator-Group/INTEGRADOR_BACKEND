@@ -1,6 +1,7 @@
-export interface AppointmentState {
+export interface Canton {
     id?: number;
     name: string;
+    id_province: number;
     id_state: number;
     state_name?: string;
     created_at?: Date;
@@ -8,12 +9,15 @@ export interface AppointmentState {
     deleted_at?: Date;
 }
 
-export interface AppointmentStateCreate {
+export interface CantonCreate {
     name: string;
+    id_province: number;
     id_state: number;
 }
 
-export interface AppointmentStateUpdate {
+export interface CantonUpdate {
     name?: string;
+    id_province?: number;
     id_state?: number;
 }
+

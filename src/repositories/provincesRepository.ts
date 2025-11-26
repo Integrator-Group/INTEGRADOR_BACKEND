@@ -1,32 +1,32 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { Role, RoleCreate, RoleUpdate } from '../models/Roles';
+import { Province, ProvinceCreate, ProvinceUpdate } from '../models/Provinces';
 
-export class RolesRepository {
-    private readonly tableName = 'roles';
+export class ProvincesRepository {
+    private readonly tableName = 'provinces';
 
-    async findAll(): Promise<Role[]> {
+    async findAll(): Promise<Province[]> {
         const [rows] = await pool.execute<any[]>(
-            `SELECT r.id, r.name, r.id_state, gs.name AS state_name
-             FROM ${this.tableName} r
-             JOIN general_status gs ON r.id_state = gs.id
-             WHERE r.deleted_at IS NULL`
+            `SELECT p.id, p.name, p.id_state, gs.name AS state_name
+             FROM ${this.tableName} p
+             JOIN general_status gs ON p.id_state = gs.id
+             WHERE p.deleted_at IS NULL`
         );
         return rows;
     }
 
-    async findById(id: number): Promise<Role | null> {
+    async findById(id: number): Promise<Province | null> {
         const [rows] = await pool.execute<any[]>(
-            `SELECT r.id, r.name, r.id_state, gs.name AS state_name
-             FROM ${this.tableName} r
-             JOIN general_status gs ON r.id_state = gs.id
-             WHERE r.id = ? AND r.deleted_at IS NULL`,
+            `SELECT p.id, p.name, p.id_state, gs.name AS state_name
+             FROM ${this.tableName} p
+             JOIN general_status gs ON p.id_state = gs.id
+             WHERE p.id = ? AND p.deleted_at IS NULL`,
             [id]
         );
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByName(name: string): Promise<Role | null> {
+    async findByName(name: string): Promise<Province | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT name
              FROM ${this.tableName}
@@ -36,30 +36,30 @@ export class RolesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async create(role: RoleCreate): Promise<Role> {
+    async create(province: ProvinceCreate): Promise<Province> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `INSERT INTO ${this.tableName} (name, id_state, created_at) VALUES (?, ?, NOW())`,
-            [role.name, role.id_state]
+            [province.name, province.id_state]
         );
         const insertId = result.insertId;
-        const newRole = await this.findById(insertId);
-        if (!newRole) {
-            throw new Error('Error al crear el rol');
+        const newProvince = await this.findById(insertId);
+        if (!newProvince) {
+            throw new Error('Error al crear la provincia');
         }
-        return newRole;
+        return newProvince;
     }
 
-    async update(id: number, role: RoleUpdate): Promise<Role | null> {
+    async update(id: number, province: ProvinceUpdate): Promise<Province | null> {
         const updates: string[] = [];
         const values: any[] = [];
 
-        if (role.name !== undefined) {
+        if (province.name !== undefined) {
             updates.push('name = ?');
-            values.push(role.name);
+            values.push(province.name);
         }
-        if (role.id_state !== undefined) {
+        if (province.id_state !== undefined) {
             updates.push('id_state = ?');
-            values.push(role.id_state);
+            values.push(province.id_state);
         }
 
         if (updates.length === 0) {
@@ -89,3 +89,4 @@ export class RolesRepository {
         return result.affectedRows > 0;
     }
 }
+

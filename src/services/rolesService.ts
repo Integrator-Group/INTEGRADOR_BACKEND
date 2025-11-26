@@ -1,5 +1,5 @@
 import { RolesRepository } from '../repositories/rolesRepository';
-import { Roles, RolesCreate, RolesUpdate } from '../models/Roles';
+import { Role, RoleCreate, RoleUpdate } from '../models/Roles';
 
 export class RolesService {
   private readonly rolesRepository: RolesRepository;
@@ -8,11 +8,11 @@ export class RolesService {
     this.rolesRepository = new RolesRepository();
   }
 
-  async getAllRoles(): Promise<Roles[]> {
+  async getAllRoles(): Promise<Role[]> {
     return this.rolesRepository.findAll();
   }
 
-  async getRoleById(id: number): Promise<Roles> {
+  async getRoleById(id: number): Promise<Role> {
     const role = await this.rolesRepository.findById(id);
     if (!role) {
       throw new Error('Rol no encontrado');
@@ -20,32 +20,46 @@ export class RolesService {
     return role;
   }
 
-  async createRole(roleData: RolesCreate): Promise<Roles> {
-    const existingRole = await this.rolesRepository.findByName(roleData.name);
-    if (existingRole) {
-      throw new Error('El nombre del rol ya existe');
-    }
-    return this.rolesRepository.create(roleData);
-  }
-
-  async updateRole(id: number, roleData: RolesUpdate): Promise<Roles> {
-    const role = await this.rolesRepository.findById(id);
-    if (!role) {
-      throw new Error('Rol no encontrado');
-    }
-
-    if (roleData.name && roleData.name !== role.name) {
-      const repeatedRole = await this.rolesRepository.findByName(roleData.name);
-      if (repeatedRole) {
+  async createRole(roleData: RoleCreate): Promise<Role> {
+    try {
+      const existingRole = await this.rolesRepository.findByName(roleData.name);
+      if (existingRole) {
         throw new Error('El nombre del rol ya existe');
       }
+      return await this.rolesRepository.create(roleData);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'El nombre del rol ya existe') {
+        throw error;
+      }
+      throw new Error('Error al crear el rol: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
+  }
 
-    const updatedRole = await this.rolesRepository.update(id, roleData);
-    if (!updatedRole) {
-      throw new Error('Error al actualizar el rol');
+  async updateRole(id: number, roleData: RoleUpdate): Promise<Role> {
+    try {
+      const role = await this.rolesRepository.findById(id);
+      if (!role) {
+        throw new Error('Rol no encontrado');
+      }
+
+      if (roleData.name && roleData.name !== role.name) {
+        const repeatedRole = await this.rolesRepository.findByName(roleData.name);
+        if (repeatedRole) {
+          throw new Error('El nombre del rol ya existe');
+        }
+      }
+
+      const updatedRole = await this.rolesRepository.update(id, roleData);
+      if (!updatedRole) {
+        throw new Error('Error al actualizar el rol');
+      }
+      return updatedRole;
+    } catch (error) {
+      if (error instanceof Error && (error.message === 'Rol no encontrado' || error.message === 'El nombre del rol ya existe')) {
+        throw error;
+      }
+      throw new Error('Error al actualizar el rol: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
-    return updatedRole;
   }
 
   async deleteRole(id: number): Promise<void> {

@@ -1,13 +1,13 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { PaymentMethods, PaymentMethodsCreate, PaymentMethodsUpdate } from '../models/Payment_Methods';
+import { PaymentMethod, PaymentMethodCreate, PaymentMethodUpdate } from '../models/Payment_Methods';
 
 export class PaymentMethodsRepository {
     private readonly tableName = 'payment_methods';
 
-    async findAll(): Promise<PaymentMethods[]> {
+    async findAll(): Promise<PaymentMethod[]> {
         const [rows] = await pool.execute<any[]>(
-            `SELECT pm.id, pm.name, pm.id_state
+            `SELECT pm.id, pm.name, pm.id_state, gs.name AS state_name
              FROM ${this.tableName} pm
              JOIN general_status gs ON pm.id_state = gs.id
              WHERE pm.deleted_at IS NULL`
@@ -15,9 +15,9 @@ export class PaymentMethodsRepository {
         return rows;
     }
     
-    async findById(id: number): Promise<PaymentMethods | null> {
+    async findById(id: number): Promise<PaymentMethod | null> {
         const [rows] = await pool.execute<any[]>(
-            `SELECT pm.id, pm.name, pm.id_state
+            `SELECT pm.id, pm.name, pm.id_state, gs.name AS state_name
              FROM ${this.tableName} pm
              JOIN general_status gs ON pm.id_state = gs.id
              WHERE pm.id = ? AND pm.deleted_at IS NULL`,
@@ -26,7 +26,7 @@ export class PaymentMethodsRepository {
         return rows.length > 0 ? rows[0] : null;
     }
     
-    async findByName(name: string): Promise<PaymentMethods | null> {
+    async findByName(name: string): Promise<PaymentMethod | null> {
         const [rows] = await pool.execute<any[]>(
             `SELECT name 
              FROM ${this.tableName}
@@ -36,7 +36,7 @@ export class PaymentMethodsRepository {
         return rows.length > 0 ? rows[0] : null;
     }
     
-    async create(paymentMethod: PaymentMethodsCreate): Promise<PaymentMethods> {
+    async create(paymentMethod: PaymentMethodCreate): Promise<PaymentMethod> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `INSERT INTO ${this.tableName} (name, id_state, created_at) VALUES (?, ?, NOW())`,
             [paymentMethod.name, paymentMethod.id_state]
@@ -49,7 +49,7 @@ export class PaymentMethodsRepository {
         return newPaymentMethod;
     }
     
-    async update(id: number, paymentMethod: PaymentMethodsUpdate): Promise<PaymentMethods | null> {
+    async update(id: number, paymentMethod: PaymentMethodUpdate): Promise<PaymentMethod | null> {
         const updates: string[] = [];
         const values: any[] = [];
         if (paymentMethod.name !== undefined) {

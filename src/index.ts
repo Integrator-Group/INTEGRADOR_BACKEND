@@ -6,6 +6,8 @@ import appointmentStatusRoutes from './routes/appointmentStatusRoutes';
 import paymentMethodsRoutes from './routes/paymentMethodsRoutes';
 import rolesRoutes from './routes/rolesRoutes';
 import branchesRoutes from './routes/branchesRoutes';
+import provincesRoutes from './routes/provincesRoutes';
+import cantonsRoutes from './routes/cantonsRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import pool from './config/database';
 dotenv.config();
@@ -26,6 +28,8 @@ app.use('/api/appointment-status', appointmentStatusRoutes);
 app.use('/api/payment-methods', paymentMethodsRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/branches', branchesRoutes)
+app.use('/api/provinces', provincesRoutes);
+app.use('/api/cantons', cantonsRoutes);
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {
