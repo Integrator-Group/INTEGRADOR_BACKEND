@@ -89,3 +89,108 @@ export const validateRoleUpdate = [
     .isInt()
     .withMessage('El ID del estado debe ser un número entero'),
 ];
+
+export const validateBranche = [
+  body('id_company')
+    .notEmpty()
+    .withMessage('El ID de la compania es requerido')
+    .isInt()
+    .withMessage('El ID de la compania debe ser un número entero'),
+
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre de la sucursal no puede estar vacio')
+    .isLength({ min: 12, max: 50})
+    .withMessage('El nombre de la sucursal debe tener entre 12 y 50 caracteres'),
+
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('El numero de celular no puede estar vacio')
+    .isLength({ min:10, max:10 })
+    .withMessage('El celular debe contener 10 digitos'),
+
+  body('address')
+    .trim()
+    .notEmpty()
+    .withMessage('La dirección de la sucursal no puede estar vacio')
+    .isLength({ min: 15, max: 250})
+    .withMessage('La dirección de la sucursal debe tener entre 15 y 250 caracteres'),
+
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('El correo de la sucursal no puede estar vacio')
+    .isLength({ min: 15, max: 250})
+    .withMessage('El correo de la sucursal debe tener entre 15 y 250 caracteres'),
+
+  body('id_province')
+    .notEmpty()
+    .withMessage('El ID de la provincia es requerido')
+    .isInt()
+    .withMessage('El ID de la provincia debe ser un número entero'),
+
+  body('id_canton')
+    .notEmpty()
+    .withMessage('El ID del cantón es requerido')
+    .isInt()
+    .withMessage('El ID del cantón debe ser un número entero'),
+
+  body('id_state')
+    .notEmpty()
+    .withMessage('El ID del estado es requerido')
+    .isInt()
+    .withMessage('El ID del estado debe ser un número entero'),
+];
+
+export const validateBrancheUpdate = [
+  body('id_company')
+    .optional()
+    .isInt()
+    .withMessage('El ID de la compania debe ser un número entero'),
+
+  body('name')
+    .optional()
+    .trim()
+    .isLength({ min: 12, max: 50})
+    .withMessage('El nombre de la sucursal debe tener entre 12 y 50 caracteres'),
+
+  body('phone')
+    .optional()
+    .trim()
+    .isLength({ min:10, max:10 })
+    .withMessage('El celular debe contener 10 digitos'),
+
+  body('address')
+    .optional()
+    .trim()
+    .isLength({ min: 15, max: 250})
+    .withMessage('La dirección de la sucursal debe tener entre 15 y 250 caracteres'),
+
+  body('email')
+    .optional()
+    .trim()
+    .isLength({ min: 15, max: 250})
+    .withMessage('El correo de la sucursal debe tener entre 15 y 250 caracteres'),
+
+  body('id_manager')
+    .optional()
+    .isInt()
+    .withMessage('El ID del gerente debe ser un número entero'),
+
+  body('id_province')
+    .optional()
+    .isInt()
+    .withMessage('El ID de la provincia debe ser un número entero'),
+
+  body('id_canton')
+    .optional()
+    .isInt()
+    .withMessage('El ID del cantón debe ser un número entero'),
+
+  body('id_state')
+    .optional()
+    .isInt()
+    .withMessage('El ID del estado debe ser un número entero'),
+];
