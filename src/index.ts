@@ -7,6 +7,7 @@ import paymentMethodsRoutes from './routes/paymentMethodsRoutes';
 import rolesRoutes from './routes/rolesRoutes';
 import provincesRoutes from './routes/provincesRoutes';
 import cantonsRoutes from './routes/cantonsRoutes';
+import itemsRoutes from './routes/itemsRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import pool from './config/database';
 dotenv.config();
@@ -28,6 +29,7 @@ app.use('/api/payment-methods', paymentMethodsRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/provinces', provincesRoutes);
 app.use('/api/cantons', cantonsRoutes);
+app.use('/api/items', itemsRoutes);
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {
