@@ -160,3 +160,88 @@ export const validateCantonUpdate = [
     .isInt()
     .withMessage('El ID del estado debe ser un número entero'),
 ];
+
+export const validateService = [
+  body('id_branch')
+    .notEmpty()
+    .withMessage('El id de la sucursal es requerido')
+    .isInt()
+    .withMessage('El id de la sucursal debe ser un entero'),
+
+  body('id_area')
+    .notEmpty()
+    .withMessage('El id del area es requerido')
+    .isInt()
+    .withMessage('El id del area debe ser un entero'),
+
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre del servicio es requerido')
+    .isLength({ min: 5, max: 100 })
+    .withMessage('El nombre del servicio debe tener entre 5 y 100 caracteres'),
+  
+  body('description')
+    .trim()
+    .notEmpty()
+    .withMessage('La descripcion del servicio es requerido')
+    .isLength({ min: 10, max: 300 })
+    .withMessage('La descripcion del servicio debe tener entre 5 y 300 caracteres'),
+
+  body('duration_min')
+    .notEmpty()
+    .withMessage('La duracion del servicio es requerida')
+    .isInt()
+    .withMessage('La duracion del servicio debe ser un entero'),
+
+  body('price')
+    .notEmpty()
+    .withMessage('El precio del servicio es requerido')
+    .isDecimal()
+    .withMessage('El precio debe ser un decimal'),
+
+  body('id_state')
+    .notEmpty()
+    .withMessage('El id del estado es requerido')
+    .isInt()
+    .withMessage('El id del estado debe ser un entero'),
+]
+
+export const validateServiceUpdate = [
+  body('id_branch')
+    .optional()
+    .isInt()
+    .withMessage('El id de la sucursal debe ser un entero'),
+
+  body('id_area')
+    .optional()
+    .isInt()
+    .withMessage('El id del area debe ser un entero'),
+
+  body('name')
+    .trim()
+    .optional()
+    .isLength({ min: 5, max: 100 })
+    .withMessage('El nombre del servicio debe tener entre 5 y 100 caracteres'),
+  
+  body('description')
+    .trim()
+    .optional()
+    .isLength({ min: 10, max: 300 })
+    .withMessage('La descripcion del servicio debe tener entre 5 y 300 caracteres'),
+
+  body('duration_min')
+    .optional()
+    .isInt()
+    .withMessage('La duracion del servicio debe ser un entero'),
+
+  body('price')
+    .optional()
+    .isDecimal()
+    .withMessage('El precio debe ser un decimal'),
+
+  body('id_state')
+    .optional()
+    .isInt()
+    .withMessage('El id del estado debe ser un entero'),
+]
