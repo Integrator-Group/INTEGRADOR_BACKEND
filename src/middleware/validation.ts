@@ -181,6 +181,7 @@ export const validateBrancheUpdate = [
     .isInt()
     .withMessage('El ID del gerente debe ser un número entero'),
 ]
+
 export const validateProvinceUpdate = [
   body('name')
     .optional()
@@ -252,6 +253,7 @@ export const validateItems = [
     .withMessage('La descripción es requerida')
     .isLength({ min: 10, max: 250 })
     .withMessage('La descripción del item debe tener entre 10 y 250 caracteres'),
+]
 
 export const validateService = [
   body('id_branch')
@@ -348,8 +350,8 @@ export const validateItemsUpdate = [
   body('id_state')
     .optional()
     .isInt()
-    .withMessage('El ID del estado debe ser un número entero'),
     .withMessage('El ID del estado debe ser un número entero')
+    .withMessage('El ID del estado debe ser un número entero'),
 ]
 
 export const validateAreasUpdate = [
@@ -433,7 +435,7 @@ export const validateSpecialtiesUpdate = [
   body('id_state')
     .optional()
     .isInt()
-    .withMessage('El id del estado debe ser un entero'),
+    .withMessage('El id del estado debe ser un entero')
     .withMessage('El nombre del area debe tener entre 5 y 100 caracteres'),
   
   body('id_state')
