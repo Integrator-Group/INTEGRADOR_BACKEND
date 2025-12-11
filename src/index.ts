@@ -8,6 +8,8 @@ import rolesRoutes from './routes/rolesRoutes';
 import branchesRoutes from './routes/branchesRoutes';
 import provincesRoutes from './routes/provincesRoutes';
 import cantonsRoutes from './routes/cantonsRoutes';
+import areasRoutes from './routes/areasRoutes';
+import specialtiesRoutes from './routes/specialtieRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import pool from './config/database';
 dotenv.config();
@@ -30,6 +32,8 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/branches', branchesRoutes)
 app.use('/api/provinces', provincesRoutes);
 app.use('/api/cantons', cantonsRoutes);
+app.use('/api/areas', areasRoutes);
+app.use('/api/specialties', specialtiesRoutes);
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {
