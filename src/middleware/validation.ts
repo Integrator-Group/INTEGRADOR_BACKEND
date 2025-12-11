@@ -238,6 +238,21 @@ export const validateCantonUpdate = [
     .withMessage('El ID del estado debe ser un número entero'),
 ];
 
+export const validateItems = [
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre es requerido')
+    .isLength({ min: 5, max: 50 })
+    .withMessage('El nombre del item debe tener entre 5 y 50 caracteres'),
+
+  body('description')
+    .trim()
+    .notEmpty()
+    .withMessage('La descripción es requerida')
+    .isLength({ min: 10, max: 250 })
+    .withMessage('La descripción del item debe tener entre 10 y 250 caracteres'),
+
 export const validateService = [
   body('id_branch')
     .notEmpty()
@@ -314,6 +329,26 @@ export const validateAreas = [
     .notEmpty()
     .withMessage('El ID del estado es requerido')
     .isInt()
+    .withMessage('El ID del estado debe ser un número entero'),
+]
+
+export const validateItemsUpdate = [
+  body('name')
+    .trim()
+    .optional()
+    .isLength({ min: 5, max: 50 })
+    .withMessage('El nombre del item debe tener entre 5 y 50 caracteres'),
+
+  body('description')
+    .trim()
+    .optional()
+    .isLength({ min: 10, max: 250 })
+    .withMessage('La descripción del item debe tener entre 10 y 250 caracteres'),
+    
+  body('id_state')
+    .optional()
+    .isInt()
+    .withMessage('El ID del estado debe ser un número entero'),
     .withMessage('El ID del estado debe ser un número entero')
 ]
 
