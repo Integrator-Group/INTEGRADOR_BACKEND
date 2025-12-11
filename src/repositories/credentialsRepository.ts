@@ -11,6 +11,8 @@ export class CredentialsRepository {
             SELECT
                 cr.id,
                 cr.id_user,
+                us.names AS user_names,
+                us.last_names AS user_last_names,
                 cr.username,
                 cr.password,
                 cr.id_state,
@@ -19,6 +21,7 @@ export class CredentialsRepository {
                 cr.updated_at,
                 cr.deleted_at
             FROM ${this.tableName} AS cr
+            JOIN users us ON cr.id_user = us.id
             JOIN general_status gs ON cr.id_state = gs.id
             WHERE cr.deleted_at IS NULL
         `;
