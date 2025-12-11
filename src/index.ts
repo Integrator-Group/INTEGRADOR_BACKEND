@@ -8,6 +8,8 @@ import rolesRoutes from './routes/rolesRoutes';
 import branchesRoutes from './routes/branchesRoutes';
 import provincesRoutes from './routes/provincesRoutes';
 import cantonsRoutes from './routes/cantonsRoutes';
+import usersRoutes from './routes/usersRoutes';
+import credentialsRoutes from './routes/credentialsRoutes';
 import itemsRoutes from './routes/itemsRoutes';
 import servicesRoutes from './routes/servicesRoutes';
 import notificationPreferenceRoutes from './routes/notificationPreferencesRoutes'
@@ -35,6 +37,8 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/branches', branchesRoutes)
 app.use('/api/provinces', provincesRoutes);
 app.use('/api/cantons', cantonsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/credentials', credentialsRoutes);
 app.use('/api/items', itemsRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/notification-preferences', notificationPreferenceRoutes);
