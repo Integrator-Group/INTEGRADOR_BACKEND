@@ -8,6 +8,8 @@ import rolesRoutes from './routes/rolesRoutes';
 import branchesRoutes from './routes/branchesRoutes';
 import provincesRoutes from './routes/provincesRoutes';
 import cantonsRoutes from './routes/cantonsRoutes';
+import servicesRoutes from './routes/servicesRoutes';
+import notificationPreferenceRoutes from './routes/notificationPreferencesRoutes'
 import areasRoutes from './routes/areasRoutes';
 import specialtiesRoutes from './routes/specialtieRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -32,6 +34,8 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/branches', branchesRoutes)
 app.use('/api/provinces', provincesRoutes);
 app.use('/api/cantons', cantonsRoutes);
+app.use('/api/services', servicesRoutes);
+app.use('/api/notification-preferences', notificationPreferenceRoutes);
 app.use('/api/areas', areasRoutes);
 app.use('/api/specialties', specialtiesRoutes);
 
