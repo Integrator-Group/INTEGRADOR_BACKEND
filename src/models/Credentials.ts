@@ -3,6 +3,7 @@ export interface Credential {
     id_user: number;
     user_names: string;
     user_last_names: string;
+    id_role: number;
     username: string;
     password: string;
     id_state: number;
@@ -40,5 +41,6 @@ export interface LoginResponse {
         names: string;
         last_names: string;
         full_name: string;
+        id_role: number;
     };
 }

@@ -13,6 +13,7 @@ export class CredentialsRepository {
                 cr.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
+                us.id_role,
                 cr.username,
                 cr.password,
                 cr.id_state,
