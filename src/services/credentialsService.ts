@@ -105,7 +105,8 @@ export class CredentialsService {
                     id_user: credential.id_user,
                     names: credential.user_names,
                     last_names: credential.user_last_names,
-                    full_name: `${credential.user_names} ${credential.user_last_names ?? ''}`.trim()
+                    full_name: `${credential.user_names} ${credential.user_last_names ?? ''}`.trim(),
+                    id_role: credential.id_role
                 },
             };
         } catch (error) {
