@@ -25,6 +25,15 @@ export class AreasServices {
         return await this.areasRepository.findByBranche(id_branche);
     }
 
+    async getBranchByArea(name: string): Promise<Area> {
+        const area = await this.areasRepository.findByArea(name);
+        if (!area) {
+            throw new Error('Sucursal no encontrada');
+        }
+
+        return area;
+    }
+
     async createArea(area: AreaCreate): Promise<Area> {
         try {
             const areaExists = await this.areasRepository.findByBranchAndName(

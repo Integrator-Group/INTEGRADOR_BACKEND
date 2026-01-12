@@ -82,6 +82,22 @@ export class AreasRepository {
         return rows;
     }
 
+    async findByArea(name: string): Promise<Area | null> {
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                ar.id_branch,
+                br.name AS branch_name
+            FROM ${this.tableName} as ar
+            JOIN branches br ON ar.id_branch = br.id
+            WHERE ar.name = ? AND ar.id_state = 1 AND ar.deleted_at IS NULL
+            `,
+            [name]
+        )
+
+        return rows.length > 0 ? rows[0] : null;
+    }
+
     async create(Area: AreaCreate): Promise<Area> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `
