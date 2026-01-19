@@ -1,6 +1,7 @@
 import { UsersRepository } from '../repositories/usersRepository';
 import { User, UserCreate, UserUpdate } from '../models/Users';
 import { CredentialsService } from './credentialsService';
+import emailService from '../utils/emailService';
 
 export class UsersService {
     private usersRepository: UsersRepository;
@@ -49,7 +50,24 @@ export class UsersService {
             const newUser = await this.usersRepository.create(user);
 
             try {
-                await this.credentialsService.createCredentialsForUser(newUser);
+                const { credential, password } = await this.credentialsService.createCredentialsForUser(newUser);
+                
+                // Enviar correo con las credenciales si el usuario tiene email
+                if (newUser.email) {
+                    try {
+                        await emailService.sendCredentialsEmail({
+                            email: newUser.email,
+                            username: credential.username,
+                            password: password,
+                            names: newUser.names,
+                            last_names: newUser.last_names,
+                        });
+                        console.log(`Correo enviado exitosamente a ${newUser.email}`);
+                    } catch (emailError) {
+                        // No revertir la creación si falla el envío del correo, solo registrar el error
+                        console.error('Error al enviar correo con credenciales:', emailError);
+                    }
+                }
             } catch (credentialError) {
                 await this.usersRepository.delete(newUser.id);
                 throw new Error('Error al crear las credenciales: ' + (credentialError instanceof Error ? credentialError.message : 'Error desconocido'));

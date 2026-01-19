@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import appointmentStatusRoutes from './routes/appointmentStatusRoutes';
+import paymentStatusRoutes from './routes/paymentStatusRoutes';
 import paymentMethodsRoutes from './routes/paymentMethodsRoutes';
 import rolesRoutes from './routes/rolesRoutes';
 import branchesRoutes from './routes/branchesRoutes';
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Rutas
 app.use('/api/appointment-status', appointmentStatusRoutes);
+app.use('/api/payment-status', paymentStatusRoutes);
 app.use('/api/payment-methods', paymentMethodsRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/branches', branchesRoutes)
