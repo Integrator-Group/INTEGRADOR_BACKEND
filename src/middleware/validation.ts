@@ -56,6 +56,34 @@ export const validatePaymentMethodsUpdate = [
     .withMessage('El ID del estado debe ser un número entero'),
 ];
 
+export const validatePaymentStatus = [
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre del estado de pago es requerido')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('El nombre del estado de pago debe tener entre 2 y 100 caracteres'),
+
+  body('id_state')
+    .notEmpty()
+    .withMessage('El ID del estado es requerido')
+    .isInt()
+    .withMessage('El ID del estado debe ser un número entero'),
+];
+
+export const validatePaymentStatusUpdate = [
+  body('name')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('El nombre del estado de pago debe tener entre 2 y 100 caracteres'),
+
+  body('id_state')
+    .optional({ checkFalsy: true })
+    .isInt()
+    .withMessage('El ID del estado debe ser un número entero'),
+];
+
 export const validateRole = [
   body('name')
     .trim()

@@ -37,7 +37,7 @@ export class CredentialsService {
         return identification.trim();
     }
 
-    async createCredentialsForUser(user: User): Promise<Credential> {
+    async createCredentialsForUser(user: User): Promise<{ credential: Credential; password: string }> {
         try {
             const existingCredentials = await this.credentialsRepository.findByIdUser(user.id);
             if (existingCredentials) {
@@ -62,7 +62,9 @@ export class CredentialsService {
                 id_state: user.id_state || 1, // Usar el mismo estado que el usuario
             };
 
-            return await this.credentialsRepository.create(credentialData);
+            const credential = await this.credentialsRepository.create(credentialData);
+            
+            return { credential, password };
         } catch (error) {
             if (error instanceof Error && (
                 error.message === 'El usuario ya tiene credenciales' ||
