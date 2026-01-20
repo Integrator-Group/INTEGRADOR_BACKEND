@@ -660,3 +660,51 @@ export const validateSpecialtiesUpdate = [
     .isInt()
     .withMessage('El ID del estado debe ser un número entero')
 ]
+
+export const validateSchedules = [
+  body('day')
+    .notEmpty()
+    .withMessage('El día es requerido')
+    .isString()
+    .withMessage('El día debe ser una cadena de texto'),
+
+  body('start_time')
+    .notEmpty()
+    .withMessage('La hora de inicio es requerida'),
+    
+  body('end_time')
+    .notEmpty()
+    .withMessage('La hora de fin es requerida'),
+    
+  body('is_available')
+    .isBoolean()
+    .withMessage('El estado de disponibilidad debe ser un booleano'),
+]
+
+export const validateSchedulesUpdate = [
+  body('id_user')
+    .optional()
+    .isInt()
+    .withMessage('El ID del usuario debe ser un número entero'),
+  
+  body('id_branch')
+    .optional()
+    .isInt()
+    .withMessage('El ID de la sucursal debe ser un número entero'),
+
+  body('day')
+    .optional()
+    .isString()
+    .withMessage('El día debe ser una cadena de texto'),
+
+  body('start_time')
+    .optional(),
+    
+  body('end_time')
+    .optional(),
+    
+  body('is_available')
+    .optional()
+    .isBoolean()
+    .withMessage('El estado de disponibilidad debe ser un booleano'),
+]
