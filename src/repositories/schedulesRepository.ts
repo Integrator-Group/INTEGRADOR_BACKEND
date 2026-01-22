@@ -15,8 +15,12 @@ export class SchedulesRepository {
                 sc.day,
                 sc.start_time,
                 sc.end_time,
-                sc.is_available
+                sc.is_available,
+                sc.created_at,
+                sc.updated_at,
+                sc.deleted_at
             FROM ${this.tableName} AS sc
+            WHERE sc.deleted_at IS NULL
             `
         )
 
@@ -33,9 +37,12 @@ export class SchedulesRepository {
                 sc.day,
                 sc.start_time,
                 sc.end_time,
-                sc.is_available
+                sc.is_available,
+                sc.created_at,
+                sc.updated_at,
+                sc.deleted_at
             FROM ${this.tableName} AS sc
-            WHERE sc.id = ?
+            WHERE sc.id = ? AND sc.deleted_at IS NULL
             `,
             [id]
         )
@@ -105,4 +112,15 @@ export class SchedulesRepository {
 
         return this.findById(id);
     }
+
+    async delete(id: number): Promise<boolean> {
+        const [result] = await pool.execute<mysql2.ResultSetHeader>(
+            `UPDATE ${this.tableName} 
+             SET deleted_at = NOW() 
+             WHERE id = ?`,
+            [id]
+        );
+
+        return result.affectedRows > 0;
+    } 
 }
