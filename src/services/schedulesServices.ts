@@ -45,4 +45,14 @@ export class SchedulesServices {
             throw new Error("Error desconocido al actualizar");
         }
     }
+
+    async deleteSchedule(id: number): Promise<void> {
+        const scheduleExist = await this.schedulesRepository.findById(id);
+
+        if (!scheduleExist) {
+            throw new Error('Horario no encontrado')
+        }
+
+        await this.schedulesRepository.delete(id);
+    }
 }

@@ -9,7 +9,7 @@ export class SchedulesController {
         this.schedulesServices = new SchedulesServices();
     }
 
-    findAll = async (req: Request, res: Response): Promise<void> => {
+    findAll = async (_req: Request, res: Response): Promise<void> => {
         try {
             const schedules = await this.schedulesServices.findAll();
             res.status(200).json({
@@ -103,6 +103,42 @@ export class SchedulesController {
                 res.status(500).json({
                   success: false,
                   message: "Error al actualizar el area",
+                  error: error instanceof Error ? error.message : "Error desconocido",
+                });
+            }
+        }
+    }
+
+    delete = async(req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id, 10);
+            if (isNaN(id)) {
+                res.status(400).json({
+                    success: false,
+                    message: "ID inválido"
+                  })
+                  return;
+            }
+
+            await this.schedulesServices.deleteSchedule(id);
+
+            res.status(200).json({
+                success: true,
+                message: 'Horario eliminado correctamente'
+            });
+        } catch (error) {
+            if (
+                error instanceof Error &&
+                error.message === "Horario no encontrado"
+            ) {
+                res.status(404).json({
+                  success: false,
+                  message: error.message,
+                });
+            } else {
+                res.status(500).json({
+                  success: false,
+                  message: "Error al eliminar el horario",
                   error: error instanceof Error ? error.message : "Error desconocido",
                 });
             }
