@@ -17,6 +17,7 @@ import notificationPreferenceRoutes from './routes/notificationPreferencesRoutes
 import areasRoutes from './routes/areasRoutes';
 import specialtiesRoutes from './routes/specialtieRoutes';
 import schedulesRoutes from './routes/schedulesRoutes';
+import appointmentsRoutes from './routes/appointmentsRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import pool from './config/database';
 dotenv.config();
@@ -48,6 +49,7 @@ app.use('/api/notification-preferences', notificationPreferenceRoutes);
 app.use('/api/areas', areasRoutes);
 app.use('/api/specialties', specialtiesRoutes);
 app.use('/api/schedules', schedulesRoutes);
+app.use('/api/appointments', appointmentsRoutes);
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {
