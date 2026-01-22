@@ -11,10 +11,25 @@ export interface Appointment {
     id_service: number;
     service_name: string;
     id_schedule: number;
-    start_time: Date;
-    end_time: Date;
+    start_time: string;
+    end_time: string;
     id_state_appointment: number;
     state_name: string;
-    feedback: string;
-    grade: number;
+}
+
+export interface AppointmentCreate {
+    id_user: number;
+    id_professional: number;
+    id_branch: number;
+    id_service: number;
+    id_schedule: number;
+    start_time: string;
+    end_time: string;
+}
+
+export interface AppointmentUpdate {
+    id_professional?: number;
+    id_schedule?: number;
+    start_time?: Date;
+    end_time?: Date;
 }

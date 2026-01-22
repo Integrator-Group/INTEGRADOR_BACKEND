@@ -708,3 +708,43 @@ export const validateSchedulesUpdate = [
     .isBoolean()
     .withMessage('El estado de disponibilidad debe ser un booleano'),
 ]
+
+export const validateAppointments = [
+  body('id_user')
+    .notEmpty()
+    .withMessage('El ID del usuario es requerido')
+    .isInt()
+    .withMessage('El ID del usuario debe ser un número entero'),
+
+  body('id_professional')
+    .notEmpty()
+    .withMessage('El ID del profesional es requerido')
+    .isInt()
+    .withMessage('El ID del profesional debe ser un número entero'),
+
+  body('id_branch')
+    .notEmpty()
+    .withMessage('El ID de la sucursal es requerido')
+    .isInt()
+    .withMessage('El ID de la sucursal debe ser un número entero'),
+
+  body('id_service')
+    .notEmpty()
+    .withMessage('El ID del servicio es requerido')
+    .isInt()
+    .withMessage('El ID del servicio debe ser un número entero'),
+    
+  body('id_schedule')
+    .notEmpty()
+    .withMessage('El ID del horario es requerido')
+    .isInt()
+    .withMessage('El ID del horario debe ser un número entero'),
+
+  body('start_time')
+    .notEmpty()
+    .withMessage('La hora de inicio es requerida'),
+
+  body('end_time')
+    .notEmpty()
+    .withMessage('La hora de inicio es requerida'),
+]
