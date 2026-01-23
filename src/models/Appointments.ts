@@ -28,8 +28,9 @@ export interface AppointmentCreate {
 }
 
 export interface AppointmentUpdate {
-    id_professional?: number;
+    id_branch?: number;
     id_schedule?: number;
     start_time?: Date;
     end_time?: Date;
+    id_state_appointment?: number;
 }

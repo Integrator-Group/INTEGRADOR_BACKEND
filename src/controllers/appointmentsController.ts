@@ -253,4 +253,49 @@ export class AppointmentsController {
             })
         }
     }
+
+    update = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Errores de validación',
+                    errors: errors.array()
+                });
+                
+                return;
+            }
+
+            const id = parseInt(req.params.id, 10);
+            if (isNaN(id)) {
+                res.status(400).json({
+                    success: false,
+                    message: "ID inválido",
+                  });
+                  return;
+            }
+
+            const appointment = await this.appointmentsServices.updateAppointment(id, req.body);
+
+            res.status(200).json({
+                success: true,
+                message:'Cita actualizada exitosamente',
+                data: appointment
+            })
+        } catch (error) {
+            if (error instanceof Error && error.message === 'Cita no encontrada') {
+                res.status(404).json({
+                    success: false,
+                    message: error.message
+                })
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: 'Error l actualizar la cita',
+                    error: error instanceof Error ? error.message : 'Error desconocido'
+                })
+            }
+        }
+    }
 }

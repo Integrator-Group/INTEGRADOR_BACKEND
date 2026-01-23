@@ -55,4 +55,24 @@ export class AppointmentsServices {
             throw new Error('Error al agendar la cita: ' + (error instanceof Error ? error.message : 'Error desconocido'))
         }
     }
+
+    async updateAppointment(id: number, appointment: AppointmentUpdate): Promise<Appointment> {
+        try {
+            const appointmentExists = await this.appointmentsRepository.findById(id);
+            if (!appointmentExists) {
+                throw new Error('Cita no encontrada');
+            }
+
+            const appointmentUpdated = await this.appointmentsRepository.update(id, appointment);
+            if (!appointmentUpdated) {
+                throw new Error('Error al actualizar la cita')
+            }
+
+            return appointmentUpdated;
+
+        } catch (error) {
+            if (error instanceof Error) throw error;
+            throw new Error('Error desconocido al actualizar')
+        }
+    }
 }
