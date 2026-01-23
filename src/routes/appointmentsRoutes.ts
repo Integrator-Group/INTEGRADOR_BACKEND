@@ -21,4 +21,7 @@ router.get('/canceled/professional/:id_professional', appointmentsController.get
 // Agendar cita
 router.post('/', validateAppointments, appointmentsController.create);
 
+//Actualizar cita
+router.put('/:id', appointmentsController.update);
+
 export default router;

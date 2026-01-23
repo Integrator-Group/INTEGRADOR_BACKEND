@@ -347,4 +347,51 @@ export class AppointmentsRepository {
 
         return newAppointment;
     }
+
+    async update(id: number, appointment: AppointmentUpdate): Promise<Appointment | null> {
+        const updates: string[] = [];
+        const values: any[] = [];
+
+        if (appointment.id_branch !== undefined) {
+            updates.push('id_branch = ?');
+            values.push(appointment.id_branch)
+        }
+
+        if (appointment.id_schedule !== undefined) {
+            updates.push('id_schedule = ?');
+            values.push(appointment.id_schedule)
+        }
+
+        if (appointment.start_time !== undefined) {
+            updates.push('start_time = ?');
+            values.push(appointment.start_time)
+        }
+
+        if (appointment.end_time !== undefined) {
+            updates.push('end_time = ?');
+            values.push(appointment.end_time)
+        }
+
+        if (appointment.id_state_appointment !== undefined) {
+            updates.push('id_state_appointment = ?');
+            values.push(appointment.id_state_appointment)
+        }
+
+        if (updates.length === 0) {
+            return this.findById(id);
+        }
+
+        updates.push('updated_at = NOW()')
+        values.push(id);
+        await pool.execute(
+            `
+            UPDATE ${this.tableName}
+            SET ${updates.join(', ')}
+            WHERE id = ?
+            `,
+            values
+        );
+
+        return this.findById(id);
+    }
 }
