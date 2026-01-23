@@ -18,6 +18,7 @@ import areasRoutes from './routes/areasRoutes';
 import specialtiesRoutes from './routes/specialtieRoutes';
 import schedulesRoutes from './routes/schedulesRoutes';
 import appointmentsRoutes from './routes/appointmentsRoutes';
+import paymentsRoutes from './routes/paymentsRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import pool from './config/database';
 dotenv.config();
@@ -50,6 +51,7 @@ app.use('/api/areas', areasRoutes);
 app.use('/api/specialties', specialtiesRoutes);
 app.use('/api/schedules', schedulesRoutes);
 app.use('/api/appointments', appointmentsRoutes);
+app.use('/api/payments', paymentsRoutes)
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {

@@ -748,3 +748,29 @@ export const validateAppointments = [
     .notEmpty()
     .withMessage('La hora de inicio es requerida'),
 ]
+
+export const validatePayments = [
+  body('id_appointment')
+    .notEmpty()
+    .withMessage('El ID de la cita es requerido')
+    .isInt()
+    .withMessage('El ID de la cita debe ser un entero'),
+
+  body('amount')
+    .notEmpty()
+    .withMessage('El valor de la cita es requerido')
+    .isDecimal()
+    .withMessage('El valor de la cita debe ser númerico'),
+  
+  body('id_method')
+    .notEmpty()
+    .withMessage('El ID del método de pago es requerido')
+    .isInt()
+    .withMessage('El ID del método de pago debe ser un entero'),
+
+  body('id_status_payment')
+    .notEmpty()
+    .withMessage('El ID del estado es requerido')
+    .isInt()
+    .withMessage('El ID del estado debe ser un entero'),
+]
