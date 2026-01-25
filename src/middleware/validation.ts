@@ -798,3 +798,19 @@ export const validateRatings = [
     .notEmpty()
     .withMessage('El comentario es requerido')
 ]
+
+export const [validateNotifications] = [
+  body('id_user')
+    .notEmpty()
+    .withMessage('El ID del usuario es requerido')
+    .isInt()
+    .withMessage('El ID del usuario debe ser un entero'),
+
+  body('title')
+    .notEmpty()
+    .withMessage('El título de la notificación es requerido'),
+
+  body('message')
+    .notEmpty()
+    .withMessage('El mensaje de la notificación es requerido')
+]
