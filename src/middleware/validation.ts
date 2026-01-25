@@ -774,3 +774,27 @@ export const validatePayments = [
     .isInt()
     .withMessage('El ID del estado debe ser un entero'),
 ]
+
+export const validateRatings = [
+  body('id_appointment')
+    .notEmpty()
+    .withMessage('El ID de la cita es requerido')
+    .isInt()
+    .withMessage('El ID de la cita debe ser un entero'),
+
+  body('id_user')
+    .notEmpty()
+    .withMessage('El ID del usuario es requerido')
+    .isInt()
+    .withMessage('El ID del usuario debe ser un entero'),
+
+  body('rating')
+    .notEmpty()
+    .withMessage('El rating es requerido')
+    .isDecimal()
+    .withMessage('El rating debe ser númerico'),
+
+  body('comment')
+    .notEmpty()
+    .withMessage('El comentario es requerido')
+]
