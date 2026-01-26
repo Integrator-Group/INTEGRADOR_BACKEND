@@ -1,5 +1,6 @@
 export interface Appointment {
     id: number;
+    seq_val: string;
     id_user: number;
     user_names: string;
     user_last_names: string;
@@ -18,6 +19,7 @@ export interface Appointment {
 }
 
 export interface AppointmentCreate {
+    seq_val: string;
     id_user: number;
     id_professional: number;
     id_branch: number;

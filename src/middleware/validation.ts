@@ -710,6 +710,10 @@ export const validateSchedulesUpdate = [
 ]
 
 export const validateAppointments = [
+  body('seq_val')
+    .notEmpty()
+    .withMessage('El secuencial es requerido'),
+    
   body('id_user')
     .notEmpty()
     .withMessage('El ID del usuario es requerido')

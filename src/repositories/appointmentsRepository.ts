@@ -10,6 +10,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -40,6 +41,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -72,6 +74,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -104,6 +107,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -136,6 +140,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -168,6 +173,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -200,6 +206,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -232,6 +239,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -264,6 +272,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -296,6 +305,7 @@ export class AppointmentsRepository {
             `
             SELECT
                 ap.id,
+                ap.seq_val,
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
@@ -327,12 +337,12 @@ export class AppointmentsRepository {
         const [result] = await pool.execute<mysq12.ResultSetHeader>(
             `
             INSERT INTO ${this.tableName}
-                (id_user, id_professional, id_branch, id_service, id_schedule, start_time, end_time, id_state_appointment, created_at)
+                (seq_val, id_user, id_professional, id_branch, id_service, id_schedule, start_time, end_time, id_state_appointment, created_at)
             VALUES
                 (?,?,?,?,?,?,?,1,NOW())
             `,
             [
-                appointmentCreate.id_user, appointmentCreate.id_professional, appointmentCreate.id_branch, 
+                appointmentCreate.seq_val, appointmentCreate.id_user, appointmentCreate.id_professional, appointmentCreate.id_branch, 
                 appointmentCreate.id_service, appointmentCreate.id_schedule, appointmentCreate.start_time,
                 appointmentCreate.end_time
             ]
