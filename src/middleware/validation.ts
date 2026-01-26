@@ -818,3 +818,25 @@ export const [validateNotifications] = [
     .notEmpty()
     .withMessage('El mensaje de la notificación es requerido')
 ]
+
+export const [validateMessagings] = [
+  body('sender_id')
+    .notEmpty()
+    .withMessage('El ID del emisor es requerido')
+    .isInt()
+    .withMessage('El ID del emisor debe ser un entero'),
+
+  body('receiver_id')
+    .notEmpty()
+    .withMessage('El ID del receptor es requerido')
+    .isInt()
+    .withMessage('El ID del receptor debe ser un entero'),
+
+  body('subject')
+    .notEmpty()
+    .withMessage('El tema del mensaje es requerido'),
+
+  body('body')
+    .notEmpty()
+    .withMessage('El contenido del mensaje es requerido')
+]
