@@ -28,16 +28,16 @@ export class SchedulesServices {
         return schedules;
     }
 
-    async findSchedulesByUserWithAppointments(id_user: number, day: string): Promise<ScheduleWithAppointments[]> {
-        const schedules = await this.schedulesRepository.findSchedulesByUserWithAppointments(id_user, day);
+    async findSchedulesByUserWithAppointments(id_user: number, day: string, date: string): Promise<ScheduleWithAppointments[]> {
+        const schedules = await this.schedulesRepository.findSchedulesByUserWithAppointments(id_user, day, date);
         if (!schedules || schedules.length === 0) {
             throw new Error('Horarios no encontrados');
         }
         return schedules;
     }
 
-    async findSchedulesByAreaWithAppointments(id_area: number, day: string): Promise<ScheduleWithAppointments[]> {
-        return await this.schedulesRepository.findSchedulesByAreaWithAppointments(id_area, day);
+    async findSchedulesByAreaWithAppointments(id_area: number, day: string, date: string): Promise<ScheduleWithAppointments[]> {
+        return await this.schedulesRepository.findSchedulesByAreaWithAppointments(id_area, day, date);
     }
     
     async createSchedule(schedule: ScheduleCreate): Promise<Schedule> {

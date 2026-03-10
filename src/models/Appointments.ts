@@ -25,6 +25,7 @@ export interface AppointmentCreate {
     id_branch: number;
     id_service: number;
     id_schedule: number;
+    id_state_appointment?: number;
     start_time: string;
     end_time: string;
 }

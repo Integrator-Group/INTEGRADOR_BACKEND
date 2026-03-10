@@ -340,12 +340,12 @@ export class AppointmentsRepository {
                 (seq_val, id_user, id_professional, id_branch, id_service, id_schedule, 
                 start_time, end_time, id_state_appointment, created_at)
             VALUES
-                (?,?,?,?,?,?,?,?,1,NOW())
+                (?,?,?,?,?,?,?,?,?,NOW())
             `,
             [
                 appointmentCreate.seq_val, appointmentCreate.id_user, appointmentCreate.id_professional, appointmentCreate.id_branch, 
                 appointmentCreate.id_service, appointmentCreate.id_schedule, appointmentCreate.start_time,
-                appointmentCreate.end_time
+                appointmentCreate.end_time, appointmentCreate.id_state_appointment ?? 1
             ]
         )
 
