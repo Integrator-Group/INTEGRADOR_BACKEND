@@ -25,6 +25,16 @@ export class SchedulesController {
         }
     }
 
+    private parseAndValidateDate(queryDate: string | undefined): string {
+        if (queryDate) {
+            const match = queryDate.match(/^\d{4}-\d{2}-\d{2}$/);
+            if (match && !isNaN(Date.parse(queryDate))) {
+                return queryDate;
+            }
+        }
+        return new Date().toISOString().split('T')[0];
+    }
+
     findByUser = async (req: Request, res: Response): Promise<void> => {
         try {
             const id_user = parseInt(req.params.id_user, 10);
@@ -45,7 +55,8 @@ export class SchedulesController {
                 return;
             }
 
-            const schedules = await this.schedulesServices.findSchedulesByUserWithAppointments(id_user, day);
+            const date = this.parseAndValidateDate(req.query.date as string | undefined);
+            const schedules = await this.schedulesServices.findSchedulesByUserWithAppointments(id_user, day, date);
             res.status(200).json({
                 success: true,
                 data: schedules
@@ -86,7 +97,8 @@ export class SchedulesController {
                 return;
             }
 
-            const schedules = await this.schedulesServices.findSchedulesByAreaWithAppointments(id_area, day);
+            const date = this.parseAndValidateDate(req.query.date as string | undefined);
+            const schedules = await this.schedulesServices.findSchedulesByAreaWithAppointments(id_area, day, date);
             res.status(200).json({
                 success: true,
                 data: schedules

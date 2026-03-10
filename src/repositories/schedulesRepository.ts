@@ -79,7 +79,7 @@ export class SchedulesRepository {
                     ), JSON_ARRAY())
                     FROM appointments ap
                     JOIN appointment_status aps ON ap.id_state_appointment = aps.id
-                    WHERE ap.id_schedule = sc.id AND ap.id_state_appointment IN (1, 2)
+                    WHERE ap.id_schedule = sc.id AND ap.id_state_appointment IN (1, 2) AND DATE(ap.start_time) = ?
                 ) AS appointments
             FROM ${this.tableName} AS sc
             LEFT JOIN users us ON sc.id_user = us.id
@@ -122,18 +122,18 @@ export class SchedulesRepository {
         return rows;
     }
 
-    async findSchedulesByUserWithAppointments(id_user: number, day: string): Promise<ScheduleWithAppointments[]> {
+    async findSchedulesByUserWithAppointments(id_user: number, day: string, date: string): Promise<ScheduleWithAppointments[]> {
         const [rows] = await pool.execute<any[]>(
             `${this.buildScheduleWithAppointmentsSelect()} AND sc.id_user = ? AND sc.day = ?`,
-            [id_user, day]
+            [date, id_user, day]
         );
         return rows.map((row) => this.parseScheduleWithAppointments(row));
     }
 
-    async findSchedulesByAreaWithAppointments(id_area: number, day: string): Promise<ScheduleWithAppointments[]> {
+    async findSchedulesByAreaWithAppointments(id_area: number, day: string, date: string): Promise<ScheduleWithAppointments[]> {
         const [rows] = await pool.execute<any[]>(
             `${this.buildScheduleWithAppointmentsSelect()} AND us.id_area = ? AND us.deleted_at IS NULL AND sc.day = ?`,
-            [id_area, day]
+            [date, id_area, day]
         );
         return rows.map((row) => this.parseScheduleWithAppointments(row));
     }
