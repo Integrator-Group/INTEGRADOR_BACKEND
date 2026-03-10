@@ -102,6 +102,14 @@ export class UsersRepository {
         return rows;
     }
 
+    async findUsersByArea(id_area: number): Promise<User[]> {
+        const [rows] = await pool.execute<any[]>(
+            `${this.buildSelectQuery()} AND us.id_area = ?`,
+            [id_area]
+        );
+        return rows;
+    }
+
     private hasValue(value: any): boolean {
         return value !== undefined && value !== null && value !== '';
     }

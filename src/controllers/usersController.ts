@@ -64,6 +64,29 @@ export class UsersController {
         }
     };
 
+    getByArea = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_area = parseInt(req.params.id_area, 10);
+            if (isNaN(id_area)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de area inválido',
+                });
+            }
+            const users = await this.usersService.getUsersByArea(id_area);
+            res.status(200).json({
+                success: true,
+                data: users,
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener los usuarios por area',
+                error: error instanceof Error ? error.message : 'Error desconocido',
+            });
+        }
+    };
+
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req);
