@@ -1,5 +1,5 @@
 import { SchedulesRepository } from "../repositories/schedulesRepository";
-import { Schedule, ScheduleCreate, ScheduleUpdate } from "../models/Schedules";
+import { Schedule, ScheduleCreate, ScheduleUpdate, ScheduleWithAppointments } from "../models/Schedules";
 
 export class SchedulesServices {
     private schedulesRepository: SchedulesRepository;
@@ -26,6 +26,18 @@ export class SchedulesServices {
             throw new Error('Horarios no encontrados');
         }
         return schedules;
+    }
+
+    async findSchedulesByUserWithAppointments(id_user: number, day: string): Promise<ScheduleWithAppointments[]> {
+        const schedules = await this.schedulesRepository.findSchedulesByUserWithAppointments(id_user, day);
+        if (!schedules || schedules.length === 0) {
+            throw new Error('Horarios no encontrados');
+        }
+        return schedules;
+    }
+
+    async findSchedulesByAreaWithAppointments(id_area: number, day: string): Promise<ScheduleWithAppointments[]> {
+        return await this.schedulesRepository.findSchedulesByAreaWithAppointments(id_area, day);
     }
     
     async createSchedule(schedule: ScheduleCreate): Promise<Schedule> {
