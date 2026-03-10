@@ -32,7 +32,8 @@ export class SchedulesController {
                 res.status(400).json({
                     success: false,
                     message: 'ID de usuario inválido'
-                })
+                });
+                return;
             }
 
             const day = req.params.day;
@@ -40,10 +41,52 @@ export class SchedulesController {
                 res.status(400).json({
                     success: false,
                     message: 'Día inválido'
-                })
+                });
+                return;
             }
 
-            const schedules = await this.schedulesServices.findSchedulesByUser(id_user, day);
+            const schedules = await this.schedulesServices.findSchedulesByUserWithAppointments(id_user, day);
+            res.status(200).json({
+                success: true,
+                data: schedules
+            })
+        } catch (error) {
+            if (error instanceof Error && error.message === 'Horarios no encontrados') {
+                res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+                return;
+            }
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener los horarios',
+                error: error instanceof Error ? error.message : 'Error desconocido'
+            })
+        }
+    }
+
+    findByArea = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_area = parseInt(req.params.id_area, 10);
+            if (isNaN(id_area)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de área inválido'
+                });
+                return;
+            }
+
+            const day = req.params.day;
+            if (!day) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Día inválido'
+                });
+                return;
+            }
+
+            const schedules = await this.schedulesServices.findSchedulesByAreaWithAppointments(id_area, day);
             res.status(200).json({
                 success: true,
                 data: schedules
@@ -51,7 +94,7 @@ export class SchedulesController {
         } catch (error) {
             res.status(500).json({
                 success: false,
-                message: 'Error al obtener los horarios',
+                message: 'Error al obtener los horarios del área',
                 error: error instanceof Error ? error.message : 'Error desconocido'
             })
         }

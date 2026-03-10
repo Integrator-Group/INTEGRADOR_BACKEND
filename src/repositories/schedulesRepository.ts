@@ -1,6 +1,6 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
-import { Schedule, ScheduleCreate, ScheduleUpdate } from '../models/Schedules';
+import { Schedule, ScheduleCreate, ScheduleUpdate, ScheduleWithAppointments } from '../models/Schedules';
 
 export class SchedulesRepository {
     private readonly tableName = 'schedules';
@@ -50,6 +50,55 @@ export class SchedulesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
+    private buildScheduleWithAppointmentsSelect(): string {
+        return `
+            SELECT
+                sc.id,
+                sc.id_user,
+                us.names AS user_names,
+                us.last_names AS user_last_names,
+                sc.id_branch,
+                br.name AS name_branch,
+                sc.day,
+                sc.start_time,
+                sc.end_time,
+                sc.is_available,
+                sc.created_at,
+                sc.updated_at,
+                sc.deleted_at,
+                (
+                    SELECT COALESCE(JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', ap.id,
+                            'seq_val', ap.seq_val,
+                            'start_time', ap.start_time,
+                            'end_time', ap.end_time,
+                            'state_name', aps.name,
+                            'id_state_appointment', ap.id_state_appointment
+                        )
+                    ), JSON_ARRAY())
+                    FROM appointments ap
+                    JOIN appointment_status aps ON ap.id_state_appointment = aps.id
+                    WHERE ap.id_schedule = sc.id AND ap.id_state_appointment IN (1, 2)
+                ) AS appointments
+            FROM ${this.tableName} AS sc
+            LEFT JOIN users us ON sc.id_user = us.id
+            LEFT JOIN branches br ON sc.id_branch = br.id
+            WHERE sc.deleted_at IS NULL
+        `;
+    }
+
+    private parseScheduleWithAppointments(row: any): ScheduleWithAppointments {
+        const appointments = typeof row.appointments === 'string'
+            ? JSON.parse(row.appointments || '[]')
+            : (row.appointments || []);
+        const { appointments: _, ...scheduleData } = row;
+        return {
+            ...scheduleData,
+            appointments: Array.isArray(appointments) ? appointments : []
+        };
+    }
+
     async findSchedulesByUser(id_user: number, day: string): Promise<Schedule[]> {
         const [rows] = await pool.execute<any[]>(
             `
@@ -71,6 +120,22 @@ export class SchedulesRepository {
         )
 
         return rows;
+    }
+
+    async findSchedulesByUserWithAppointments(id_user: number, day: string): Promise<ScheduleWithAppointments[]> {
+        const [rows] = await pool.execute<any[]>(
+            `${this.buildScheduleWithAppointmentsSelect()} AND sc.id_user = ? AND sc.day = ?`,
+            [id_user, day]
+        );
+        return rows.map((row) => this.parseScheduleWithAppointments(row));
+    }
+
+    async findSchedulesByAreaWithAppointments(id_area: number, day: string): Promise<ScheduleWithAppointments[]> {
+        const [rows] = await pool.execute<any[]>(
+            `${this.buildScheduleWithAppointmentsSelect()} AND us.id_area = ? AND us.deleted_at IS NULL AND sc.day = ?`,
+            [id_area, day]
+        );
+        return rows.map((row) => this.parseScheduleWithAppointments(row));
     }
 
 
