@@ -1,12 +1,15 @@
 import { CredentialsRepository } from '../repositories/credentialsRepository';
 import { Credential, CredentialCreate, CredentialUpdate, LoginRequest, LoginResponse } from '../models/Credentials';
 import { User } from '../models/Users';
+import { UsersRepository } from '../repositories/usersRepository';
 
 export class CredentialsService {
     private credentialsRepository: CredentialsRepository;
+    private usersRepository: UsersRepository;
 
     constructor() {
         this.credentialsRepository = new CredentialsRepository();
+        this.usersRepository = new UsersRepository();
     }
 
     generatePassword(names: string, last_names: string | undefined, identification: string | undefined): string {
@@ -91,6 +94,14 @@ export class CredentialsService {
                 };
             }
 
+            const user = await this.usersRepository.findById(credential.id_user);
+            if (!user) {
+                return {
+                    success: false,
+                    message: 'Usuario no encontrado',
+                };
+            }
+
             if (credential.id_state !== 1) {
                 return {
                     success: false,
@@ -108,7 +119,9 @@ export class CredentialsService {
                     names: credential.user_names,
                     last_names: credential.user_last_names,
                     full_name: `${credential.user_names} ${credential.user_last_names ?? ''}`.trim(),
-                    id_role: credential.id_role
+                    id_role: credential.id_role,
+                    email: user.email,
+                    phone: user.phone,
                 },
             };
         } catch (error) {

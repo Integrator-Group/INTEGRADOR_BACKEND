@@ -42,5 +42,7 @@ export interface LoginResponse {
         last_names: string;
         full_name: string;
         id_role: number;
+        email?: string;
+        phone?: string;
     };
 }
