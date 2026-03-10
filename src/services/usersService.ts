@@ -152,4 +152,8 @@ export class UsersService {
     async getUsersByRole(id_role: number): Promise<User[]> {
         return await this.usersRepository.findUserByRol(id_role);
     }
+
+    async getUsersByArea(id_area: number): Promise<User[]> {
+        return await this.usersRepository.findUsersByArea(id_area);
+    }
 }
