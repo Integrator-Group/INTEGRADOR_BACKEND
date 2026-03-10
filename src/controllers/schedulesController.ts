@@ -25,6 +25,38 @@ export class SchedulesController {
         }
     }
 
+    findByUser = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_user = parseInt(req.params.id_user, 10);
+            if (isNaN(id_user)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de usuario inválido'
+                })
+            }
+
+            const day = req.params.day;
+            if (!day) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Día inválido'
+                })
+            }
+
+            const schedules = await this.schedulesServices.findSchedulesByUser(id_user, day);
+            res.status(200).json({
+                success: true,
+                data: schedules
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener los horarios',
+                error: error instanceof Error ? error.message : 'Error desconocido'
+            })
+        }
+    }
+
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req);

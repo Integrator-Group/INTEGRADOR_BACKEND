@@ -19,6 +19,14 @@ export class SchedulesServices {
         }
         return schedule;
     }
+
+    async findSchedulesByUser(id_user: number, day: string): Promise<Schedule[]> {
+        const schedules = await this.schedulesRepository.findSchedulesByUser(id_user, day);
+        if (!schedules || schedules.length === 0) {
+            throw new Error('Horarios no encontrados');
+        }
+        return schedules;
+    }
     
     async createSchedule(schedule: ScheduleCreate): Promise<Schedule> {
         try {

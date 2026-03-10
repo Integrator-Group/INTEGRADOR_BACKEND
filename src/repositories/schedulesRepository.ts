@@ -50,6 +50,30 @@ export class SchedulesRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
+    async findSchedulesByUser(id_user: number, day: string): Promise<Schedule[]> {
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                sc.id,
+                sc.id_user,
+                sc.id_branch,
+                sc.day,
+                sc.start_time,
+                sc.end_time,
+                sc.is_available,
+                sc.created_at,
+                sc.updated_at,
+                sc.deleted_at
+            FROM ${this.tableName} AS sc
+            WHERE sc.id_user = ? AND sc.day = ? AND sc.deleted_at IS NULL
+            `,
+            [id_user, day]
+        )
+
+        return rows;
+    }
+
+
     async create(schedule: ScheduleCreate): Promise<Schedule> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `
