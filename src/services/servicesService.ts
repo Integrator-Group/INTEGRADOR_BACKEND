@@ -24,6 +24,14 @@ export class ServicesServices {
         return service;
     }
 
+    async getServicesByArea(id_area: number): Promise<Service[]> {
+        const service = await this.servicesRepository.findServicesByArea(id_area);
+        if (!service || service.length === 0) {
+            throw new Error('Servicios no encontrados');
+        }
+        return service;
+    }
+
     async createService(service: ServiceCreate): Promise<Service> {
         try {
             const nameExists = await this.servicesRepository.findServiceByName(service.id_branch, service.id_area, service.name);
