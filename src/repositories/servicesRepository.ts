@@ -1,7 +1,6 @@
 import mysql2 from 'mysql2/promise';
 import pool from '../config/database';
 import { Service, ServiceCreate, ServiceUpdate } from '../models/Services';
-import { describe } from 'node:test';
 
 export class ServicesRepository {
     private readonly tableName = 'services';
@@ -57,6 +56,32 @@ export class ServicesRepository {
             [id]
         )
         return rows.length > 0 ? rows[0] : null;
+    }
+
+    async findServicesByArea(id_area: number): Promise<Service[]> {
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                se.id,
+                se.id_branch,
+                br.name AS name_branch,
+                se.id_area,
+                ar.name AS name_area,
+                se.name,
+                se.description,
+                se.duration_min,
+                se.price,
+                se.id_state,
+                gs.name AS name_state
+            FROM ${this.tableName} AS se
+            JOIN branches br ON se.id_branch = br.id
+            JOIN areas ar ON se.id_area = ar.id
+            JOIN general_status gs ON se.id_state = gs.id
+            WHERE se.id_area = ? AND se.deleted_at IS NULL
+            `,
+            [id_area]
+        )
+        return rows;
     }
 
     async findServiceByName(id_branch: number, id_area: number, name: string): Promise<Service | null> {

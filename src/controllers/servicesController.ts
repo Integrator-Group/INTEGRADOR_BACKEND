@@ -61,7 +61,55 @@ export class ServicesController {
                 error: error instanceof Error ? error.message : "Error desconocido",
             });
         }
-      };      
+    };
+    
+    getByArea = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({
+                    success: false,
+                    errors: errors.array(),
+                });
+            }
+
+            const idAreaRaw = req.params.id_area as string | undefined;
+            if (!idAreaRaw) {
+                res.status(400).json({
+                    success: false,
+                    message: "El parametro de la area es obligatorio",
+                });
+                return;
+            }
+            const idArea = Number(idAreaRaw);
+            if (Number.isNaN(idArea)) {
+                res.status(400).json({
+                    success: false,
+                    message: "El parametro de la area debe ser numérico",
+                });
+                return;
+            }
+
+            const services = await this.servicesServices.getServicesByArea(idArea);
+            if (!services || services.length === 0) {
+                res.status(404).json({
+                    success: false,
+                    message: "No se encontraron servicios para esa area",
+                });
+                return;
+            }
+            res.status(200).json({
+                success: true,
+                data: services,
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Error al obtener los servicios por area",
+                error: error instanceof Error ? error.message : "Error desconocido",
+            });
+        }
+    };
 
     create = async (req: Request, res: Response): Promise<void> => {
         try {
