@@ -9,6 +9,49 @@ export class ServicesController {
         this.servicesServices = new ServicesServices();
     }
 
+    getAll = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const limitRaw = req.query.limit as string | undefined;
+            const offsetRaw = req.query.offset as string | undefined;
+
+            const limit = limitRaw ? Number(limitRaw) : 50;
+            const offset = offsetRaw ? Number(offsetRaw) : 0;
+
+            if (!Number.isFinite(limit) || Number.isNaN(limit) || limit <= 0) {
+                res.status(400).json({
+                    success: false,
+                    message: "El query param 'limit' debe ser un número mayor a 0",
+                });
+                return;
+            }
+
+            if (!Number.isFinite(offset) || Number.isNaN(offset) || offset < 0) {
+                res.status(400).json({
+                    success: false,
+                    message: "El query param 'offset' debe ser un número mayor o igual a 0",
+                });
+                return;
+            }
+
+            const safeLimit = Math.min(Math.floor(limit), 200);
+            const safeOffset = Math.floor(offset);
+
+            const services = await this.servicesServices.getAllServices(safeLimit, safeOffset);
+
+            res.status(200).json({
+                success: true,
+                data: services,
+                meta: { limit: safeLimit, offset: safeOffset, count: services.length },
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Error al obtener los servicios",
+                error: error instanceof Error ? error.message : "Error desconocido",
+            });
+        }
+    };
+
     getByBranch = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req);

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { PaymentsServices } from "../services/paymentsServices";
 import { validationResult } from "express-validator";
-import { promises } from "dns";
 
 export class PaymentsController {
     private paymentsServices: PaymentsServices;

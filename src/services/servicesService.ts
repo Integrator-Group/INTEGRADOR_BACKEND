@@ -8,6 +8,10 @@ export class ServicesServices {
         this.servicesRepository = new ServicesRepository();
     }
 
+    async getAllServices(limit: number, offset: number): Promise<Service[]> {
+        return this.servicesRepository.findAll(limit, offset);
+    }
+
     async getServicesByBranch(id_branch: number): Promise<Service[]> {
         const service = await this.servicesRepository.findServicesByBranch(id_branch);
         if (!service || service.length === 0) {

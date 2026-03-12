@@ -1,13 +1,72 @@
 import { Request, Response } from 'express';
 import { UsersService } from '../services/usersService';
+import { UserOrdersService } from '../services/userOrdersService';
 import { validationResult } from 'express-validator';
 
 export class UsersController {
     private usersService: UsersService;
+    private userOrdersService: UserOrdersService;
 
     constructor() {
         this.usersService = new UsersService();
+        this.userOrdersService = new UserOrdersService();
     }
+
+    getOrdersAndPayments = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_user = parseInt(req.params.id_user, 10);
+            if (isNaN(id_user)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de usuario inválido',
+                });
+                return;
+            }
+
+            const limitRaw = req.query.limit as string | undefined;
+            const offsetRaw = req.query.offset as string | undefined;
+
+            const limit = limitRaw ? Number(limitRaw) : 50;
+            const offset = offsetRaw ? Number(offsetRaw) : 0;
+
+            if (!Number.isFinite(limit) || Number.isNaN(limit) || limit <= 0) {
+                res.status(400).json({
+                    success: false,
+                    message: "El query param 'limit' debe ser un número mayor a 0",
+                });
+                return;
+            }
+
+            if (!Number.isFinite(offset) || Number.isNaN(offset) || offset < 0) {
+                res.status(400).json({
+                    success: false,
+                    message: "El query param 'offset' debe ser un número mayor o igual a 0",
+                });
+                return;
+            }
+
+            const safeLimit = Math.min(Math.floor(limit), 200);
+            const safeOffset = Math.floor(offset);
+
+            const data = await this.userOrdersService.getOrdersAndPaymentsByUser(
+                id_user,
+                safeLimit,
+                safeOffset
+            );
+
+            res.status(200).json({
+                success: true,
+                data,
+                meta: { limit: safeLimit, offset: safeOffset, count: data.length },
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener las órdenes y pagos del usuario',
+                error: error instanceof Error ? error.message : 'Error desconocido',
+            });
+        }
+    };
 
     getById = async (req: Request, res: Response): Promise<void> => {
         try {
