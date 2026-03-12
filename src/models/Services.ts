@@ -8,6 +8,7 @@ export interface Service {
     description: string;
     duration_min: number;
     price: number;
+    price_points: number;
     id_state: number;
     name_state?: string;
     created_at?: Date;
@@ -22,6 +23,7 @@ export interface ServiceCreate {
     description: string;
     duration_min: number;
     price: number;
+    price_points: number;
     id_state: number;
 }
 
@@ -32,5 +34,6 @@ export interface ServiceUpdate {
     description?: string;
     duration_min?: number;
     price?: number;
+    price_points?: number;
     id_state?: number;
 }

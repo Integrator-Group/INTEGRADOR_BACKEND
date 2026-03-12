@@ -2,14 +2,17 @@ import { CredentialsRepository } from '../repositories/credentialsRepository';
 import { Credential, CredentialCreate, CredentialUpdate, LoginRequest, LoginResponse } from '../models/Credentials';
 import { User } from '../models/Users';
 import { UsersRepository } from '../repositories/usersRepository';
+import { CustomerLoyaltyService } from './customerLoyaltyService';
 
 export class CredentialsService {
     private credentialsRepository: CredentialsRepository;
     private usersRepository: UsersRepository;
+    private customerLoyaltyService: CustomerLoyaltyService;
 
     constructor() {
         this.credentialsRepository = new CredentialsRepository();
         this.usersRepository = new UsersRepository();
+        this.customerLoyaltyService = new CustomerLoyaltyService();
     }
 
     generatePassword(names: string, last_names: string | undefined, identification: string | undefined): string {
@@ -122,6 +125,9 @@ export class CredentialsService {
                     id_role: credential.id_role,
                     email: user.email,
                     phone: user.phone,
+                    loyalty: {
+                        points: (await this.customerLoyaltyService.getByUser(credential.id_user)).points,
+                    },
                 },
             };
         } catch (error) {

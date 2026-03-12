@@ -44,5 +44,8 @@ export interface LoginResponse {
         id_role: number;
         email?: string;
         phone?: string;
+        loyalty?: {
+            points: number;
+        };
     };
 }
