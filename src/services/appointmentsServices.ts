@@ -75,4 +75,13 @@ export class AppointmentsServices {
             throw new Error('Error desconocido al actualizar')
         }
     }
+
+    async cancelAppointment(id: number): Promise<Appointment> {
+        try {
+            return await this.appointmentsRepository.cancelAndReversePayment(id);
+        } catch (error) {
+            if (error instanceof Error) throw error;
+            throw new Error('Error desconocido al cancelar la cita');
+        }
+    }
 }

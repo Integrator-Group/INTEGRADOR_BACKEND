@@ -4,6 +4,8 @@ import { Appointment, AppointmentCreate, AppointmentUpdate } from '../models/App
 
 export class AppointmentsRepository {
     private readonly tableName = 'appointments';
+    private readonly canceledStateId = 3;
+    private readonly reversedPaymentStatusId = 4;
 
     async findAll(): Promise<Appointment[]> {
         const [rows] = await pool.execute<any[]>(
@@ -338,14 +340,14 @@ export class AppointmentsRepository {
             `
             INSERT INTO ${this.tableName}
                 (seq_val, id_user, id_professional, id_branch, id_service, id_schedule, 
-                start_time, end_time, id_state_appointment, created_at)
+                start_time, end_time, id_state_appointment, schedule_date, created_at)
             VALUES
-                (?,?,?,?,?,?,?,?,?,NOW())
+                (?,?,?,?,?,?,?,?,?,NOW(),?)
             `,
             [
                 appointmentCreate.seq_val, appointmentCreate.id_user, appointmentCreate.id_professional, appointmentCreate.id_branch, 
                 appointmentCreate.id_service, appointmentCreate.id_schedule, appointmentCreate.start_time,
-                appointmentCreate.end_time, appointmentCreate.id_state_appointment ?? 1
+                appointmentCreate.end_time, appointmentCreate.id_state_appointment ?? 1, appointmentCreate.schedule_date
             ]
         )
 
@@ -388,6 +390,11 @@ export class AppointmentsRepository {
             values.push(appointment.id_state_appointment)
         }
 
+        if (appointment.schedule_date !== undefined) {
+            updates.push('schedule_date = ?');
+            values.push(appointment.schedule_date)
+        }
+
         if (updates.length === 0) {
             return this.findById(id);
         }
@@ -404,5 +411,45 @@ export class AppointmentsRepository {
         );
 
         return this.findById(id);
+    }
+
+    async cancelAndReversePayment(id_appointment: number): Promise<Appointment> {
+        const conn = await pool.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const [apptResult] = await conn.execute<mysq12.ResultSetHeader>(
+                `
+                UPDATE ${this.tableName}
+                SET id_state_appointment = ?, updated_at = NOW()
+                WHERE id = ?
+                `,
+                [this.canceledStateId, id_appointment]
+            );
+
+            if (apptResult.affectedRows === 0) {
+                throw new Error('Cita no encontrada');
+            }
+
+            await conn.execute(
+                `
+                UPDATE payments
+                SET id_status_payment = ?, updated_at = NOW()
+                WHERE id_appointment = ?
+                `,
+                [this.reversedPaymentStatusId, id_appointment]
+            );
+
+            await conn.commit();
+        } catch (error) {
+            await conn.rollback();
+            throw error;
+        } finally {
+            conn.release();
+        }
+
+        const updated = await this.findById(id_appointment);
+        if (!updated) throw new Error('Cita no encontrada');
+        return updated;
     }
 }

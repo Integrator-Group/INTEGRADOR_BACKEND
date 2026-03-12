@@ -5,6 +5,38 @@ import { Service, ServiceCreate, ServiceUpdate } from '../models/Services';
 export class ServicesRepository {
     private readonly tableName = 'services';
 
+    async findAll(limit: number, offset: number): Promise<Service[]> {
+        const safeLimit = Number.isInteger(limit) ? limit : Math.floor(limit);
+        const safeOffset = Number.isInteger(offset) ? offset : Math.floor(offset);
+        if (!Number.isFinite(safeLimit) || safeLimit <= 0) throw new Error("Limit inválido");
+        if (!Number.isFinite(safeOffset) || safeOffset < 0) throw new Error("Offset inválido");
+
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                se.id,
+                se.id_branch,
+                br.name AS name_branch,
+                se.id_area,
+                ar.name AS name_area,
+                se.name,
+                se.description,
+                se.duration_min,
+                se.price,
+                se.id_state,
+                gs.name AS name_state
+            FROM ${this.tableName} AS se
+            JOIN branches br ON se.id_branch = br.id
+            JOIN areas ar ON se.id_area = ar.id
+            JOIN general_status gs ON se.id_state = gs.id
+            WHERE se.deleted_at IS NULL
+            ORDER BY se.id DESC
+            LIMIT ${safeLimit} OFFSET ${safeOffset}
+            `
+        );
+        return rows;
+    }
+
     async findServicesByBranch(id_branch: number): Promise<Service[]> {
         const [rows] = await pool.execute<any[]>(
             `

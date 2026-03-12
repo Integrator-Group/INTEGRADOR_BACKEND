@@ -9,7 +9,7 @@ export class AppointmentsController {
         this.appointmentsServices = new AppointmentsServices;
     }
 
-    getAll = async(req: Request, res: Response): Promise<void> => {
+    getAll = async(_req: Request, res: Response): Promise<void> => {
         try {
             const appointments = await this.appointmentsServices.getAllAppointments();
             res.status(200).json({
@@ -296,6 +296,39 @@ export class AppointmentsController {
                     error: error instanceof Error ? error.message : 'Error desconocido'
                 })
             }
+        }
+    }
+
+    cancel = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id, 10);
+            if (isNaN(id)) {
+                res.status(400).json({
+                    success: false,
+                    message: "ID inválido",
+                });
+                return;
+            }
+
+            const appointment = await this.appointmentsServices.cancelAppointment(id);
+            res.status(200).json({
+                success: true,
+                message: "Cita cancelada y pago reversado (si existía)",
+                data: appointment,
+            });
+        } catch (error) {
+            if (error instanceof Error && error.message === "Cita no encontrada") {
+                res.status(404).json({
+                    success: false,
+                    message: error.message,
+                });
+                return;
+            }
+            res.status(500).json({
+                success: false,
+                message: "Error al cancelar la cita",
+                error: error instanceof Error ? error.message : "Error desconocido",
+            });
         }
     }
 }

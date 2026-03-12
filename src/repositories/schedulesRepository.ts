@@ -79,7 +79,10 @@ export class SchedulesRepository {
                     ), JSON_ARRAY())
                     FROM appointments ap
                     JOIN appointment_status aps ON ap.id_state_appointment = aps.id
-                    WHERE ap.id_schedule = sc.id AND ap.id_state_appointment IN (1, 2) AND DATE(ap.start_time) = ?
+                    WHERE
+                        (ap.id_schedule = sc.id OR ap.id_professional = sc.id_user)
+                        AND ap.id_state_appointment IN (1, 2)
+                        AND ap.schedule_date = ?
                 ) AS appointments
             FROM ${this.tableName} AS sc
             LEFT JOIN users us ON sc.id_user = us.id
@@ -89,13 +92,14 @@ export class SchedulesRepository {
     }
 
     private parseScheduleWithAppointments(row: any): ScheduleWithAppointments {
-        const appointments = typeof row.appointments === 'string'
+        const parsedAppointments = typeof row.appointments === 'string'
             ? JSON.parse(row.appointments || '[]')
             : (row.appointments || []);
-        const { appointments: _, ...scheduleData } = row;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { appointments, ...scheduleData } = row;
         return {
             ...scheduleData,
-            appointments: Array.isArray(appointments) ? appointments : []
+            appointments: Array.isArray(parsedAppointments) ? parsedAppointments : []
         };
     }
 

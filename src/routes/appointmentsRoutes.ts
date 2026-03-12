@@ -24,4 +24,7 @@ router.post('/', validateAppointments, appointmentsController.create);
 //Actualizar cita
 router.put('/:id', appointmentsController.update);
 
+// Cancelar cita y reversar pago
+router.put('/:id/cancel', appointmentsController.cancel);
+
 export default router;

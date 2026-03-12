@@ -6,8 +6,9 @@ const router = Router();
 const usersController = new UsersController();
 
 router.get('/role/:id_role', usersController.getByRole);
-router.get('/:id', usersController.getById);
 router.get('/area/:id_area', usersController.getByArea);
+router.get('/:id_user/orders', usersController.getOrdersAndPayments);
+router.get('/:id', usersController.getById);
 router.post('/', validateUser, usersController.create);
 router.put('/:id', validateUserUpdate, usersController.update);
 router.delete('/:id', usersController.delete);

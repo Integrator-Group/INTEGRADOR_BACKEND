@@ -16,6 +16,7 @@ export interface Appointment {
     end_time: string;
     id_state_appointment: number;
     state_name: string;
+    schedule_date: Date;
 }
 
 export interface AppointmentCreate {
@@ -28,12 +29,14 @@ export interface AppointmentCreate {
     id_state_appointment?: number;
     start_time: string;
     end_time: string;
+    schedule_date: Date;
 }
 
 export interface AppointmentUpdate {
     id_branch?: number;
     id_schedule?: number;
-    start_time?: Date;
-    end_time?: Date;
+    start_time?: string;
+    end_time?: string;
     id_state_appointment?: number;
+    schedule_date?: Date;
 }
