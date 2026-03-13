@@ -203,6 +203,40 @@ export class AppointmentsRepository {
         return rows;
     }
 
+    async findAllByProfessionalDate(id_professional: number, date: string): Promise<Appointment[]> {
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                ap.id,
+                ap.seq_val,
+                ap.id_user,
+                us.names AS user_names,
+                us.last_names AS user_last_names,
+                pr.names AS pro_names,
+                pr.last_names AS pro_last_names,
+                ap.id_branch,
+                br.name AS branch_name,
+                ap.id_service,
+                se.name AS service_name,
+                ap.start_time,
+                ap.end_time,
+                ap.id_state_appointment,
+                aps.name AS state_name,
+                ap.schedule_date
+            FROM ${this.tableName} AS ap
+            JOIN users us ON ap.id_user = us.id
+            JOIN users pr ON ap.id_professional = pr.id
+            JOIN branches br ON ap.id_branch = br.id
+            JOIN services se ON ap.id_service = se.id
+            JOIN appointment_status aps ON ap.id_state_appointment = aps.id
+            WHERE ap.id_professional = ? AND ap.schedule_date = ?
+            `,
+            [id_professional, date]
+        );
+
+        return rows;
+    }
+
     async findAllByProfessional(id_professional: number): Promise<Appointment[]> {
         const [rows] = await pool.execute<any[]>(
             `
@@ -221,7 +255,8 @@ export class AppointmentsRepository {
                 ap.start_time,
                 ap.end_time,
                 ap.id_state_appointment,
-                aps.name AS state_name
+                aps.name AS state_name,
+                ap.schedule_date
             FROM ${this.tableName} AS ap
             JOIN users us ON ap.id_user = us.id
             JOIN users pr ON ap.id_professional = pr.id
@@ -232,7 +267,6 @@ export class AppointmentsRepository {
             `,
             [id_professional]
         );
-
         return rows;
     }
 
@@ -342,7 +376,7 @@ export class AppointmentsRepository {
                 (seq_val, id_user, id_professional, id_branch, id_service, id_schedule, 
                 start_time, end_time, id_state_appointment, schedule_date, created_at)
             VALUES
-                (?,?,?,?,?,?,?,?,?,NOW(),?)
+                (?,?,?,?,?,?,?,?,?,?,NOW())
             `,
             [
                 appointmentCreate.seq_val, appointmentCreate.id_user, appointmentCreate.id_professional, appointmentCreate.id_branch, 
@@ -359,6 +393,79 @@ export class AppointmentsRepository {
         }
 
         return newAppointment;
+    }
+
+    async createWithLoyalty(
+        appointmentCreate: AppointmentCreate,
+        pointsDelta: number,
+        reason: string | null
+    ): Promise<Appointment> {
+        const conn = await pool.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const [result] = await conn.execute<mysq12.ResultSetHeader>(
+                `
+                INSERT INTO ${this.tableName}
+                    (seq_val, id_user, id_professional, id_branch, id_service, id_schedule, 
+                    start_time, end_time, id_state_appointment, schedule_date, created_at)
+                VALUES
+                    (?,?,?,?,?,?,?,?,?,?,NOW())
+                `,
+                [
+                    appointmentCreate.seq_val,
+                    appointmentCreate.id_user,
+                    appointmentCreate.id_professional,
+                    appointmentCreate.id_branch,
+                    appointmentCreate.id_service,
+                    appointmentCreate.id_schedule,
+                    appointmentCreate.start_time,
+                    appointmentCreate.end_time,
+                    appointmentCreate.id_state_appointment ?? 1,
+                    appointmentCreate.schedule_date,
+                ]
+            );
+
+            const insertId = result.insertId;
+
+            if (Number.isFinite(pointsDelta) && pointsDelta !== 0) {
+                await conn.execute(
+                    `
+                    INSERT INTO customer_loyalty (id_user, points)
+                    VALUES (?, 0)
+                    ON DUPLICATE KEY UPDATE id_user = VALUES(id_user)
+                    `,
+                    [appointmentCreate.id_user]
+                );
+
+                await conn.execute(
+                    `
+                    UPDATE customer_loyalty
+                    SET points = points + ?
+                    WHERE id_user = ?
+                    `,
+                    [pointsDelta, appointmentCreate.id_user]
+                );
+
+                await conn.execute(
+                    `
+                    INSERT INTO loyalty_transactions (id_user, points_delta, reason, created_at)
+                    VALUES (?, ?, ?, NOW())
+                    `,
+                    [appointmentCreate.id_user, pointsDelta, reason]
+                );
+            }
+
+            await conn.commit();
+            const created = await this.findById(insertId);
+            if (!created) throw new Error('Error al registrar la cita');
+            return created;
+        } catch (error) {
+            await conn.rollback();
+            throw error;
+        } finally {
+            conn.release();
+        }
     }
 
     async update(id: number, appointment: AppointmentUpdate): Promise<Appointment | null> {

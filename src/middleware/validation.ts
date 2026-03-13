@@ -751,6 +751,12 @@ export const validateAppointments = [
   body('end_time')
     .notEmpty()
     .withMessage('La hora de inicio es requerida'),
+
+  body('schedule_date')
+    .notEmpty()
+    .withMessage('La fecha de agendamiento es requerida')
+    .matches(/^\d{4}-\d{2}-\d{2}$/)
+    .withMessage('La fecha de agendamiento debe tener formato YYYY-MM-DD'),
 ]
 
 export const validatePayments = [

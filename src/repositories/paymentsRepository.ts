@@ -24,6 +24,24 @@ export class PaymentsRepository {
         return rows.length > 0 ? rows[0] : null;
     }
 
+    async findByAppointmentId(id_appointment: number): Promise<Payment[]> {
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                py.id,
+                py.id_appointment,
+                py.amount,
+                py.id_method,
+                py.id_status_payment,
+                py.paid_at
+            FROM ${this.tableName} py
+            WHERE py.id_appointment = ?
+            `,
+            [id_appointment]
+        );
+        return rows;
+    }
+
     async create(payment: PaymentCreate): Promise<Payment> {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `

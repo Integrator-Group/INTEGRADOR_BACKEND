@@ -23,6 +23,12 @@ export interface UserOrderPaymentInfo {
   paid_at?: string | null;
 }
 
+export interface UserOrderRatingInfo {
+  rating: number;
+  comment: string;
+  created_at?: string | null;
+}
+
 export interface UserOrderPaymentView {
   appointment_id: number;
   order_number: string;
@@ -34,5 +40,6 @@ export interface UserOrderPaymentView {
   professional: UserOrderProfessionalInfo;
   branch: UserOrderBranchInfo;
   payment: UserOrderPaymentInfo | null;
+  rating: UserOrderRatingInfo | null;
 }
 

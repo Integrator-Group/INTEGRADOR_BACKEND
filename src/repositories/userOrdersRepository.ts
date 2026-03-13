@@ -1,5 +1,5 @@
 import pool from "../config/database";
-import { UserOrderPaymentView } from "../models/UserOrders";
+import { UserOrderPaymentView, UserOrderRatingInfo } from "../models/UserOrders";
 
 type UserOrderPaymentRow = {
   appointment_id: number;
@@ -21,6 +21,9 @@ type UserOrderPaymentRow = {
   payment_method: string | null;
   payment_status: string | null;
   paid_at: string | null;
+  rating_value: number | null;
+  rating_comment: string | null;
+  rating_created_at: string | null;
 };
 
 export class UserOrdersRepository {
@@ -53,7 +56,10 @@ export class UserOrdersRepository {
         py.amount AS payment_amount,
         pm.name AS payment_method,
         ps.name AS payment_status,
-        py.paid_at AS paid_at
+        py.paid_at AS paid_at,
+        sr.rating AS rating_value,
+        sr.comment AS rating_comment,
+        sr.created_at AS rating_created_at
       FROM appointments ap
       JOIN appointment_status aps ON ap.id_state_appointment = aps.id
       JOIN services se ON ap.id_service = se.id
@@ -72,43 +78,56 @@ export class UserOrdersRepository {
       ) py ON py.id_appointment = ap.id
       LEFT JOIN payment_methods pm ON py.id_method = pm.id
       LEFT JOIN payment_status ps ON py.id_status_payment = ps.id
+      LEFT JOIN service_ratings sr ON sr.id_appointment = ap.id AND sr.id_user = ?
       WHERE ap.id_user = ?
       ORDER BY ap.schedule_date DESC, ap.created_at DESC
       LIMIT ${safeLimit} OFFSET ${safeOffset}
       `,
-      [id_user]
+      [id_user, id_user]
     );
 
-    return (rows as UserOrderPaymentRow[]).map((r) => ({
-      appointment_id: r.appointment_id,
-      order_number: r.order_number,
-      schedule_date: r.schedule_date,
-      start_time: r.start_time,
-      end_time: r.end_time,
-      status: r.status,
-      service: {
-        name: r.service_name,
-        description: r.service_description,
-        duration_min: r.service_duration_min,
-        price: r.service_price,
-      },
-      professional: {
-        id: r.professional_id,
-        names: r.professional_names,
-        last_names: r.professional_last_names,
-        profile_photo: r.professional_profile_photo,
-      },
-      branch: { name: r.branch_name },
-      payment:
-        r.payment_amount === null || !r.payment_method || !r.payment_status
-          ? null
-          : {
-              amount: r.payment_amount,
-              method: r.payment_method,
-              status: r.payment_status,
-              paid_at: r.paid_at,
-            },
-    }));
+    return (rows as UserOrderPaymentRow[]).map((r) => {
+      const rating: UserOrderRatingInfo | null =
+        r.rating_value != null
+          ? {
+              rating: Number(r.rating_value),
+              comment: r.rating_comment ?? "",
+              created_at: r.rating_created_at ?? null,
+            }
+          : null;
+
+      return {
+        appointment_id: r.appointment_id,
+        order_number: r.order_number,
+        schedule_date: r.schedule_date,
+        start_time: r.start_time,
+        end_time: r.end_time,
+        status: r.status,
+        service: {
+          name: r.service_name,
+          description: r.service_description,
+          duration_min: r.service_duration_min,
+          price: r.service_price,
+        },
+        professional: {
+          id: r.professional_id,
+          names: r.professional_names,
+          last_names: r.professional_last_names,
+          profile_photo: r.professional_profile_photo,
+        },
+        branch: { name: r.branch_name },
+        payment:
+          r.payment_amount === null || !r.payment_method || !r.payment_status
+            ? null
+            : {
+                amount: r.payment_amount,
+                method: r.payment_method,
+                status: r.payment_status,
+                paid_at: r.paid_at,
+              },
+        rating,
+      };
+    });
   }
 }
 
