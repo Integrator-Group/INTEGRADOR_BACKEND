@@ -135,8 +135,17 @@ export class AppointmentsController {
                 })
                 return;
             }
+            const date = req.query.date as string;
+            if (!date) {
+                const appointments = await this.appointmentsServices.getAllAppointmentsByProfessional(id_professional);
+                res.status(200).json({
+                    success: true,
+                    data: appointments
+                })
+                return;
+            }
 
-            const appointments = await this.appointmentsServices.getAllAppointmentsByProfessional(id_professional);
+            const appointments = await this.appointmentsServices.getAllAppointmentsByProfessionalDate(id_professional, date);
             res.status(200).json({
                 success: true,
                 data: appointments

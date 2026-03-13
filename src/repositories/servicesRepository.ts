@@ -24,7 +24,8 @@ export class ServicesRepository {
                 se.duration_min,
                 se.price,
                 se.id_state,
-                gs.name AS name_state
+                gs.name AS name_state,
+                se.price_points
             FROM ${this.tableName} AS se
             JOIN branches br ON se.id_branch = br.id
             JOIN areas ar ON se.id_area = ar.id
@@ -51,7 +52,8 @@ export class ServicesRepository {
                 se.duration_min,
                 se.price,
                 se.id_state,
-                gs.name AS name_state
+                gs.name AS name_state,
+                se.price_points
             FROM ${this.tableName} AS se
             JOIN branches br ON se.id_branch = br.id
             JOIN areas ar ON se.id_area = ar.id
@@ -78,7 +80,8 @@ export class ServicesRepository {
                 se.duration_min,
                 se.price,
                 se.id_state,
-                gs.name AS name_state
+                gs.name AS name_state,
+                se.price_points
             FROM ${this.tableName} AS se
             JOIN branches br ON se.id_branch = br.id
             JOIN areas ar ON se.id_area = ar.id
@@ -104,7 +107,8 @@ export class ServicesRepository {
                 se.duration_min,
                 se.price,
                 se.id_state,
-                gs.name AS name_state
+                gs.name AS name_state,
+                se.price_points
             FROM ${this.tableName} AS se
             JOIN branches br ON se.id_branch = br.id
             JOIN areas ar ON se.id_area = ar.id
@@ -123,7 +127,8 @@ export class ServicesRepository {
                 se.id,
                 se.id_branch,
                 se.id_area,
-                se.name
+                se.name,
+                se.price_points
             FROM ${this.tableName} AS se
             WHERE se.id_branch = ?
               AND se.id_area = ?
@@ -140,9 +145,9 @@ export class ServicesRepository {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `
             INSERT INTO ${this.tableName}
-            (id_branch, id_area, name, description, duration_min, price, id_state, created_at)
+            (id_branch, id_area, name, description, duration_min, price, id_state, price_points, created_at)
             VALUES
-            (?,?,?,?,?,?,?,NOW())
+            (?,?,?,?,?,?,?,?,NOW())
             `,
             [
                 Service.id_branch,
@@ -151,7 +156,8 @@ export class ServicesRepository {
                 Service.description,
                 Service.duration_min,
                 Service.price,
-                Service.id_state
+                Service.id_state,
+                Service.price_points
             ]
         )
 
@@ -197,6 +203,11 @@ export class ServicesRepository {
         if (Service.price !== undefined) {
             updates.push('price = ?');
             values.push(Service.price);
+        }
+
+        if (Service.price_points !== undefined) {
+            updates.push('price_points = ?');
+            values.push(Service.price_points);
         }
 
         if (Service.id_state !== undefined) {

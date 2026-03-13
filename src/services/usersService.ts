@@ -1,23 +1,29 @@
 import { UsersRepository } from '../repositories/usersRepository';
 import { User, UserCreate, UserUpdate } from '../models/Users';
 import { CredentialsService } from './credentialsService';
+import { CustomerLoyaltyService } from './customerLoyaltyService';
 import emailService from '../utils/emailService';
+
+export type UserWithLoyalty = User & { loyalty: { points: number } };
 
 export class UsersService {
     private usersRepository: UsersRepository;
     private credentialsService: CredentialsService;
+    private customerLoyaltyService: CustomerLoyaltyService;
 
     constructor() {
         this.usersRepository = new UsersRepository();
         this.credentialsService = new CredentialsService();
+        this.customerLoyaltyService = new CustomerLoyaltyService();
     }
 
-    async getUserById(id: number): Promise<User> {
+    async getUserById(id: number): Promise<UserWithLoyalty> {
         const user = await this.usersRepository.findById(id);
         if (!user) {
             throw new Error('Usuario no encontrado');
         }
-        return user;
+        const loyalty = await this.customerLoyaltyService.getByUser(id);
+        return { ...user, loyalty: { points: loyalty.points } };
     }
 
     async createUser(user: UserCreate): Promise<User> {

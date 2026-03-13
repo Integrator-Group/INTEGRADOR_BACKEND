@@ -1,11 +1,42 @@
 import { AppointmentsRepository } from "../repositories/appointmentsRepository";
+import { PaymentsRepository } from "../repositories/paymentsRepository";
+import { PaymentMethodsRepository } from "../repositories/paymentMethodsRepository";
 import { Appointment, AppointmentCreate, AppointmentUpdate } from "../models/Appointments";
+import { ServicesRepository } from "../repositories/servicesRepository";
+import { CustomerLoyaltyService } from "./customerLoyaltyService";
+
+const REVERSED_PAYMENT_STATUS_ID = 4;
+const COMPLETED_APPOINTMENT_STATUS_ID = 2;
+const PAYMENT_METHOD_POINTS_NAMES = ["puntos", "punto"];
+const PAYMENT_METHOD_CASH_NAMES = ["efectivo", "cash"];
+
+function isPointsPayment(methodName: string): boolean {
+    const name = (methodName || "").toLowerCase().trim();
+    return PAYMENT_METHOD_POINTS_NAMES.some(
+        (keyword) => name === keyword || name.includes(keyword)
+    );
+}
+
+function isCashPayment(methodName: string): boolean {
+    const name = (methodName || "").toLowerCase().trim();
+    return PAYMENT_METHOD_CASH_NAMES.some(
+        (keyword) => name === keyword || name.includes(keyword)
+    );
+}
 
 export class AppointmentsServices {
     private readonly appointmentsRepository: AppointmentsRepository;
+    private readonly servicesRepository: ServicesRepository;
+    private readonly customerLoyaltyService: CustomerLoyaltyService;
+    private readonly paymentsRepository: PaymentsRepository;
+    private readonly paymentMethodsRepository: PaymentMethodsRepository;
 
     constructor() {
         this.appointmentsRepository = new AppointmentsRepository();
+        this.servicesRepository = new ServicesRepository();
+        this.customerLoyaltyService = new CustomerLoyaltyService();
+        this.paymentsRepository = new PaymentsRepository();
+        this.paymentMethodsRepository = new PaymentMethodsRepository();
     }
 
     async getAllAppointments(): Promise<Appointment[]> {
@@ -28,6 +59,10 @@ export class AppointmentsServices {
         return this.appointmentsRepository.findCanceledByUser(id_user);
     }
 
+    async getAllAppointmentsByProfessionalDate(id_professional: number, date: string): Promise<Appointment[]> {
+        return this.appointmentsRepository.findAllByProfessionalDate(id_professional, date);
+    }
+
     async getAllAppointmentsByProfessional(id_professional: number): Promise<Appointment[]> {
         return this.appointmentsRepository.findAllByProfessional(id_professional);
     }
@@ -46,6 +81,9 @@ export class AppointmentsServices {
 
     async createAppointment(appointment: AppointmentCreate): Promise<Appointment> {
         try {
+            const service = await this.servicesRepository.findServiceById(Number(appointment.id_service));
+            if (!service) throw new Error("Servicio no encontrado");
+
             return await this.appointmentsRepository.create(appointment);
         } catch (error) {
             if (error instanceof Error) {
@@ -59,13 +97,37 @@ export class AppointmentsServices {
     async updateAppointment(id: number, appointment: AppointmentUpdate): Promise<Appointment> {
         try {
             const appointmentExists = await this.appointmentsRepository.findById(id);
+            console.log("appointmentExists", appointmentExists);
             if (!appointmentExists) {
                 throw new Error('Cita no encontrada');
             }
 
             const appointmentUpdated = await this.appointmentsRepository.update(id, appointment);
+            console.log("appointmentUpdated", appointmentUpdated);
             if (!appointmentUpdated) {
                 throw new Error('Error al actualizar la cita')
+            }
+            console.log("appointment", appointment);
+
+            if ( Number(appointment.id_state_appointment) === COMPLETED_APPOINTMENT_STATUS_ID ) {
+                console.log("appointment.id_state_appointment", appointment.id_state_appointment);
+                const payments = await this.paymentsRepository.findByAppointmentId(id);
+                console.log("payments", payments);
+                for (const payment of payments) {
+                    if (payment.id_status_payment === REVERSED_PAYMENT_STATUS_ID) continue;
+                    const method = await this.paymentMethodsRepository.findById(payment.id_method);
+                    if (method && isCashPayment(method.name)) {
+                        console.log("isCashPayment", isCashPayment(method.name));
+                        const amount = Number(payment.amount);
+                        if (Number.isFinite(amount) && amount > 0) {
+                            await this.customerLoyaltyService.earn({
+                                id_user: appointmentExists.id_user,
+                                amount,
+                                reason: "Pago en efectivo - Cita completada",
+                            });
+                        }
+                    }
+                }
             }
 
             return appointmentUpdated;
@@ -78,6 +140,46 @@ export class AppointmentsServices {
 
     async cancelAppointment(id: number): Promise<Appointment> {
         try {
+            const appointment = await this.appointmentsRepository.findById(id);
+            if (!appointment) {
+                throw new Error("Cita no encontrada");
+            }
+
+            const payments = await this.paymentsRepository.findByAppointmentId(id);
+            for (const payment of payments) {
+                if (payment.id_status_payment === REVERSED_PAYMENT_STATUS_ID) continue;
+                const method = await this.paymentMethodsRepository.findById(payment.id_method);
+                if (!method) continue;
+                if (isPointsPayment(method.name)) {
+                    const pointsToRefund = Number(payment.amount);
+                    if (Number.isFinite(pointsToRefund) && pointsToRefund > 0) {
+                        await this.customerLoyaltyService.refundPoints(
+                            appointment.id_user,
+                            pointsToRefund,
+                            "Reversión por cancelación"
+                        );
+                    }
+                } else if (!isCashPayment(method.name)) {
+                    const amount = Number(payment.amount);
+                    if (Number.isFinite(amount) && amount > 0) {
+                        await this.customerLoyaltyService.reverseEarn(
+                            appointment.id_user,
+                            amount,
+                            "Reversión por cancelación"
+                        );
+                    }
+                } else if (appointment.id_state_appointment === COMPLETED_APPOINTMENT_STATUS_ID) {
+                    const amount = Number(payment.amount);
+                    if (Number.isFinite(amount) && amount > 0) {
+                        await this.customerLoyaltyService.reverseEarn(
+                            appointment.id_user,
+                            amount,
+                            "Reversión por cancelación"
+                        );
+                    }
+                }
+            }
+
             return await this.appointmentsRepository.cancelAndReversePayment(id);
         } catch (error) {
             if (error instanceof Error) throw error;
