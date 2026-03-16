@@ -46,13 +46,6 @@ export class CantonsService {
         throw new Error('Cantón no encontrado');
       }
 
-      if (cantonData.name && cantonData.name !== canton.name) {
-        const repeatedCanton = await this.cantonsRepository.findByName(cantonData.name);
-        if (repeatedCanton) {
-          throw new Error('El nombre del cantón ya existe');
-        }
-      }
-
       const updatedCanton = await this.cantonsRepository.update(id, cantonData);
       if (!updatedCanton) {
         throw new Error('Error al actualizar el cantón');

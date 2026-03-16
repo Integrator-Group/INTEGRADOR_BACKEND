@@ -135,8 +135,16 @@ export class AppointmentsController {
                 })
                 return;
             }
-            const date = req.query.date as string;
-            if (!date) {
+            const startDate = req.query.startDate as string;
+            const endDate = req.query.endDate as string;
+            if (!startDate || !endDate) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Las fechas de inicio y fin son requeridas'
+                })
+                return;
+            }
+            if (!startDate || !endDate) {
                 const appointments = await this.appointmentsServices.getAllAppointmentsByProfessional(id_professional);
                 res.status(200).json({
                     success: true,
@@ -145,7 +153,7 @@ export class AppointmentsController {
                 return;
             }
 
-            const appointments = await this.appointmentsServices.getAllAppointmentsByProfessionalDate(id_professional, date);
+            const appointments = await this.appointmentsServices.getAllAppointmentsByProfessionalDate(id_professional, startDate, endDate);
             res.status(200).json({
                 success: true,
                 data: appointments

@@ -846,3 +846,41 @@ export const [validateMessagings] = [
     .notEmpty()
     .withMessage('El contenido del mensaje es requerido')
 ]
+
+export const validateInventory = [
+  body('id_item')
+    .notEmpty()
+    .withMessage('El ID del item es requerido')
+    .isInt({ min: 1 })
+    .withMessage('El ID del item debe ser un entero positivo'),
+
+  body('id_branch')
+    .notEmpty()
+    .withMessage('El ID de la sucursal es requerido')
+    .isInt({ min: 1 })
+    .withMessage('El ID de la sucursal debe ser un entero positivo'),
+
+  body('quantity')
+    .notEmpty()
+    .withMessage('La cantidad es requerida')
+    .isInt({ min: 0 })
+    .withMessage('La cantidad debe ser un entero mayor o igual a 0'),
+
+  body('min_stock')
+    .notEmpty()
+    .withMessage('El stock mínimo es requerido')
+    .isInt({ min: 0 })
+    .withMessage('El stock mínimo debe ser un entero mayor o igual a 0'),
+];
+
+export const validateInventoryUpdate = [
+  body('quantity')
+    .optional({ checkFalsy: false })
+    .isInt({ min: 0 })
+    .withMessage('La cantidad debe ser un entero mayor o igual a 0'),
+
+  body('min_stock')
+    .optional({ checkFalsy: false })
+    .isInt({ min: 0 })
+    .withMessage('El stock mínimo debe ser un entero mayor o igual a 0'),
+];

@@ -60,12 +60,7 @@ export class BranchesServices {
           if (!brancheExists) {
             throw new Error("Sucursal no encontrada");
           }
-          if (branche.name) {
-            const nameExists = await this.branchesRepository.findByName(branche.name);
-            if (nameExists && nameExists.id !== id) {
-              throw new Error("El nombre de la sucursal ya existe");
-            }
-          }
+          
           if (branche.phone) {
             const phoneExists = await this.branchesRepository.findByPhone(branche.phone);
             if (phoneExists && phoneExists.id !== id) {
