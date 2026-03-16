@@ -56,7 +56,12 @@ export class InventoryController {
                 return;
             }
 
-            const inventory = await this.inventoryService.getInventoryByBranch(id_branch);
+            const nameQuery = req.query.name as string | undefined;
+            const nameFilter = nameQuery?.trim();
+            const inventory = nameFilter
+                ? await this.inventoryService.getInventoryByBranchAndName(id_branch, nameFilter)
+                : await this.inventoryService.getInventoryByBranch(id_branch);
+
             res.status(200).json({ success: true, data: inventory });
         } catch (error) {
             res.status(500).json({

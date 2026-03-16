@@ -16,6 +16,7 @@ export class InventoryRepository {
                 br.name AS branch_name,
                 inv.quantity,
                 inv.min_stock,
+                it.description AS item_description,
                 inv.created_at,
                 inv.updated_at
             FROM ${this.tableName} AS inv
@@ -60,6 +61,7 @@ export class InventoryRepository {
                 br.name AS branch_name,
                 inv.quantity,
                 inv.min_stock,
+                it.description AS item_description,
                 inv.created_at,
                 inv.updated_at
             FROM ${this.tableName} AS inv
@@ -68,6 +70,32 @@ export class InventoryRepository {
             WHERE inv.id_branch = ?
             `,
             [id_branch]
+        );
+        return rows;
+    }
+
+    async findByBranchAndName(id_branch: number, name: string): Promise<Inventory[]> {
+        const likePattern = `%${name}%`;
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                inv.id,
+                inv.id_item,
+                it.name AS item_name,
+                inv.id_branch,
+                br.name AS branch_name,
+                inv.quantity,
+                inv.min_stock,
+                it.description AS item_description,
+                inv.created_at,
+                inv.updated_at
+            FROM ${this.tableName} AS inv
+            JOIN items it ON inv.id_item = it.id
+            JOIN branches br ON inv.id_branch = br.id
+            WHERE inv.id_branch = ? AND it.name LIKE ?
+            ORDER BY it.name ASC
+            `,
+            [id_branch, likePattern]
         );
         return rows;
     }

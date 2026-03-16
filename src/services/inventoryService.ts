@@ -24,6 +24,10 @@ export class InventoryService {
         return await this.inventoryRepository.findByBranch(id_branch);
     }
 
+    async getInventoryByBranchAndName(id_branch: number, name: string): Promise<Inventory[]> {
+        return await this.inventoryRepository.findByBranchAndName(id_branch, name);
+    }
+
     async createInventory(data: InventoryCreate): Promise<Inventory> {
         try {
             const exists = await this.inventoryRepository.findByItemAndBranch(data.id_item, data.id_branch);
