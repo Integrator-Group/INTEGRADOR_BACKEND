@@ -242,6 +242,42 @@ export class AppointmentsController {
         }
     }
 
+    getAllByBranch = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_branch = parseInt(req.params.id_branch, 10);
+            if (isNaN(id_branch)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de sucursal inválido'
+                });
+                return;
+            }
+
+            const startDate = req.query.startDate as string;
+            const endDate = req.query.endDate as string;
+
+            if (!startDate || !endDate) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Los parámetros startDate y endDate son requeridos'
+                });
+                return;
+            }
+
+            const appointments = await this.appointmentsServices.getAllAppointmentsByBranch(id_branch, startDate, endDate);
+            res.status(200).json({
+                success: true,
+                data: appointments
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener las citas de la sucursal',
+                error: error instanceof Error ? error.message : 'Error desconocido'
+            });
+        }
+    }
+
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req);

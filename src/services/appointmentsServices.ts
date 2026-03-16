@@ -79,6 +79,10 @@ export class AppointmentsServices {
         return this.appointmentsRepository.findCanceledByProfessional(id_professional)
     }
 
+    async getAllAppointmentsByBranch(id_branch: number, startDate: string, endDate: string): Promise<Appointment[]> {
+        return this.appointmentsRepository.findAllByBranch(id_branch, startDate, endDate);
+    }
+
     async createAppointment(appointment: AppointmentCreate): Promise<Appointment> {
         try {
             const service = await this.servicesRepository.findServiceById(Number(appointment.id_service));

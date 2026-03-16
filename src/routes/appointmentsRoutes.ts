@@ -6,6 +6,10 @@ const router = Router();
 const appointmentsController = new AppointmentsController();
 
 router.get('/', appointmentsController.getAll);
+
+// Listado por sucursal (con filtro opcional ?schedule_date=YYYY-MM-DD)
+router.get('/branch/:id_branch', appointmentsController.getAllByBranch);
+
 // Listado para Usuarios
 router.get('/user/:id_user', appointmentsController.getAllByUser)
 router.get('/scheduled/user/:id_user', appointmentsController.getScheduledByUser)

@@ -374,6 +374,46 @@ export class AppointmentsRepository {
         return rows;
     }
 
+    async findAllByBranch(id_branch: number, startDate: string, endDate: string): Promise<Appointment[]> {
+        const startDateFormatted = new Date(startDate).toISOString().split('T')[0];
+        const endDateFormatted = new Date(endDate).toISOString().split('T')[0];
+
+        const [rows] = await pool.execute<any[]>(
+            `
+            SELECT
+                ap.id,
+                ap.seq_val,
+                ap.id_user,
+                us.names AS user_names,
+                us.last_names AS user_last_names,
+                pr.names AS pro_names,
+                pr.last_names AS pro_last_names,
+                ap.id_branch,
+                br.name AS branch_name,
+                ap.id_service,
+                se.name AS service_name,
+                ap.start_time,
+                ap.end_time,
+                ap.id_state_appointment,
+                aps.name AS state_name,
+                ap.schedule_date
+            FROM ${this.tableName} AS ap
+            JOIN users us ON ap.id_user = us.id
+            JOIN users pr ON ap.id_professional = pr.id
+            JOIN branches br ON ap.id_branch = br.id
+            JOIN services se ON ap.id_service = se.id
+            JOIN appointment_status aps ON ap.id_state_appointment = aps.id
+            WHERE ap.id_branch = ?
+              AND ap.schedule_date >= ?
+              AND ap.schedule_date <= ?
+            ORDER BY ap.schedule_date ASC, ap.start_time ASC
+            `,
+            [id_branch, startDateFormatted, endDateFormatted]
+        );
+
+        return rows;
+    }
+
     async create(appointmentCreate: AppointmentCreate): Promise<Appointment> {
         const [result] = await pool.execute<mysq12.ResultSetHeader>(
             `
