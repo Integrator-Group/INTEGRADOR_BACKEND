@@ -23,6 +23,7 @@ import ratingsRoutes from './routes/serviceRatingsRoutes';
 import notificationsRoutes from './routes/notificationsRoutes';
 import messagingsRoutes from './routes/messagingsRoutes';
 import customerLoyaltyRoutes from './routes/customerLoyaltyRoutes';
+import inventoryRoutes from './routes/inventoryRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import pool from './config/database';
 dotenv.config();
@@ -60,6 +61,7 @@ app.use('/api/ratings', ratingsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/messagings', messagingsRoutes);
 app.use('/api/customer-loyalty', customerLoyaltyRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {

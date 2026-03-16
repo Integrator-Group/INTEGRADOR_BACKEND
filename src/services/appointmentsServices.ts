@@ -59,8 +59,8 @@ export class AppointmentsServices {
         return this.appointmentsRepository.findCanceledByUser(id_user);
     }
 
-    async getAllAppointmentsByProfessionalDate(id_professional: number, date: string): Promise<Appointment[]> {
-        return this.appointmentsRepository.findAllByProfessionalDate(id_professional, date);
+    async getAllAppointmentsByProfessionalDate(id_professional: number, startDate: string, endDate: string): Promise<Appointment[]> {
+        return this.appointmentsRepository.findAllByProfessionalDate(id_professional, startDate, endDate);
     }
 
     async getAllAppointmentsByProfessional(id_professional: number): Promise<Appointment[]> {
@@ -77,6 +77,10 @@ export class AppointmentsServices {
 
     async getCanceledByProfessional(id_professional: number): Promise<Appointment[]> {
         return this.appointmentsRepository.findCanceledByProfessional(id_professional)
+    }
+
+    async getAllAppointmentsByBranch(id_branch: number, startDate: string, endDate: string): Promise<Appointment[]> {
+        return this.appointmentsRepository.findAllByBranch(id_branch, startDate, endDate);
     }
 
     async createAppointment(appointment: AppointmentCreate): Promise<Appointment> {

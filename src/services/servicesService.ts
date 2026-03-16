@@ -59,16 +59,6 @@ export class ServicesServices {
                 throw new Error('Servicio no encontrado');
             }
 
-            if(service.name) {
-                const effectiveBranchId = service.id_branch ?? serviceExists.id_branch;
-                const effectiveAreaId = service.id_area ?? serviceExists.id_area;
-
-                const duplicated = await this.servicesRepository.findServiceByName(effectiveBranchId, effectiveAreaId, service.name);
-                if (duplicated) {
-                    throw new Error('Ya existe un servicio en la sucursal y área');
-                }
-            }
-
             const serviceUpdate = await this.servicesRepository.update(id, service);
             if (!serviceUpdate) {
                 throw new Error('Error al actualizar el servicio');

@@ -135,8 +135,16 @@ export class AppointmentsController {
                 })
                 return;
             }
-            const date = req.query.date as string;
-            if (!date) {
+            const startDate = req.query.startDate as string;
+            const endDate = req.query.endDate as string;
+            if (!startDate || !endDate) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Las fechas de inicio y fin son requeridas'
+                })
+                return;
+            }
+            if (!startDate || !endDate) {
                 const appointments = await this.appointmentsServices.getAllAppointmentsByProfessional(id_professional);
                 res.status(200).json({
                     success: true,
@@ -145,7 +153,7 @@ export class AppointmentsController {
                 return;
             }
 
-            const appointments = await this.appointmentsServices.getAllAppointmentsByProfessionalDate(id_professional, date);
+            const appointments = await this.appointmentsServices.getAllAppointmentsByProfessionalDate(id_professional, startDate, endDate);
             res.status(200).json({
                 success: true,
                 data: appointments
@@ -231,6 +239,42 @@ export class AppointmentsController {
                 message: 'Error al obtener las citas',
                 error: error instanceof Error ? error.message : 'Error desconocido',
               });
+        }
+    }
+
+    getAllByBranch = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_branch = parseInt(req.params.id_branch, 10);
+            if (isNaN(id_branch)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de sucursal inválido'
+                });
+                return;
+            }
+
+            const startDate = req.query.startDate as string;
+            const endDate = req.query.endDate as string;
+
+            if (!startDate || !endDate) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Los parámetros startDate y endDate son requeridos'
+                });
+                return;
+            }
+
+            const appointments = await this.appointmentsServices.getAllAppointmentsByBranch(id_branch, startDate, endDate);
+            res.status(200).json({
+                success: true,
+                data: appointments
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener las citas de la sucursal',
+                error: error instanceof Error ? error.message : 'Error desconocido'
+            });
         }
     }
 

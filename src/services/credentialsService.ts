@@ -125,6 +125,7 @@ export class CredentialsService {
                     id_role: credential.id_role,
                     email: user.email,
                     phone: user.phone,
+                    id_branch: user.id_branch,
                     loyalty: {
                         points: (await this.customerLoyaltyService.getByUser(credential.id_user)).points,
                     },
