@@ -22,6 +22,7 @@ import paymentsRoutes from './routes/paymentsRoutes';
 import ratingsRoutes from './routes/serviceRatingsRoutes';
 import notificationsRoutes from './routes/notificationsRoutes';
 import messagingsRoutes from './routes/messagingsRoutes';
+import reportsRoutes from './routes/reportsRoutes';
 import customerLoyaltyRoutes from './routes/customerLoyaltyRoutes';
 import inventoryRoutes from './routes/inventoryRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -62,6 +63,7 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/messagings', messagingsRoutes);
 app.use('/api/customer-loyalty', customerLoyaltyRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Ruta de salud
 app.get('/health', async (_req, res) => {

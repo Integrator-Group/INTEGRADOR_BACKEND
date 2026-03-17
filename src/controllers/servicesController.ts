@@ -52,6 +52,49 @@ export class ServicesController {
         }
     };
 
+    getById = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const idRaw = req.params.id as string | undefined;
+            if (!idRaw) {
+                res.status(400).json({
+                    success: false,
+                    message: "El parámetro 'id' es obligatorio",
+                });
+                return;
+            }
+
+            const id = Number(idRaw);
+            if (Number.isNaN(id)) {
+                res.status(400).json({
+                    success: false,
+                    message: "El parámetro 'id' debe ser numérico",
+                });
+                return;
+            }
+
+            const service = await this.servicesServices.getServicesById(id);
+
+            res.status(200).json({
+                success: true,
+                data: service,
+            });
+        } catch (error) {
+            if (error instanceof Error && error.message === "Servicios no encontrados") {
+                res.status(404).json({
+                    success: false,
+                    message: "Servicio no encontrado",
+                });
+                return;
+            }
+
+            res.status(500).json({
+                success: false,
+                message: "Error al obtener el servicio",
+                error: error instanceof Error ? error.message : "Error desconocido",
+            });
+        }
+    };
+
     getByBranch = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req);
