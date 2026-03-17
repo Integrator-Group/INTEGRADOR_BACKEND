@@ -4,6 +4,7 @@ export interface Appointment {
     id_user: number;
     user_names: string;
     user_last_names: string;
+    user_email: string;
     id_professional: number;
     pro_names: string;
     pro_last_names: string;

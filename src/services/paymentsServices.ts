@@ -3,6 +3,8 @@ import { PaymentMethodsRepository } from "../repositories/paymentMethodsReposito
 import { AppointmentsRepository } from "../repositories/appointmentsRepository";
 import { Payment, PaymentCreate, PaymentUpdate } from "../models/Payments";
 import { CustomerLoyaltyService } from "./customerLoyaltyService";
+import emailService from "../utils/emailService";
+import { buildAppointmentInvoicePdf } from "../utils/invoicePdfBuilder";
 
 const PAYMENT_METHOD_POINTS_NAMES = ["puntos", "punto"];
 const PAYMENT_METHOD_CASH_NAMES = ["efectivo", "cash"];
@@ -76,6 +78,48 @@ export class PaymentsServices {
             }
 
             const savedPayment = await this.paymentsRepository.create(payment);
+
+            try {
+                const customerFullName = `${appointment.user_names} ${appointment.user_last_names || ""}`.trim();
+                const professionalFullName = `${appointment.pro_names} ${appointment.pro_last_names || ""}`.trim();
+                const scheduleDate = appointment.schedule_date;
+
+                const invoicePdf = await buildAppointmentInvoicePdf({
+                    seq_val: appointment.seq_val,
+                    customerFullName,
+                    professionalFullName,
+                    serviceName: appointment.service_name,
+                    branchName: appointment.branch_name,
+                    scheduleDate,
+                    startTime: appointment.start_time,
+                    endTime: appointment.end_time,
+                    paymentAmount: payment.amount,
+                    paymentMethodName: paymentMethod ? paymentMethod.name : undefined,
+                });
+
+                if (appointment.user_names && appointment.user_last_names && (appointment as any).user_email) {
+                    const to = (appointment as any).user_email as string;
+                    await emailService.sendAppointmentConfirmationEmail(
+                        {
+                            to,
+                            customerFullName,
+                            professionalFullName,
+                            serviceName: appointment.service_name,
+                            scheduleDate,
+                            startTime: appointment.start_time,
+                            endTime: appointment.end_time,
+                            paymentAmount: payment.amount,
+                            paymentMethodName: paymentMethod ? paymentMethod.name : undefined,
+                            appointmentCode: appointment.seq_val,
+                            clientPortalUrl: undefined,
+                        },
+                        invoicePdf
+                    );
+                }
+            } catch (emailError) {
+                console.error("Error al enviar correo de confirmación de cita:", emailError);
+            }
+
             return savedPayment;
         } catch (error) {
             if (loyaltyModified) {

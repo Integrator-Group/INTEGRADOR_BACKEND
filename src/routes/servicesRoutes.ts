@@ -7,7 +7,8 @@ const servicesController = new ServicesController();
 
 router.get("/", servicesController.getAll);
 router.get("/area/:id_area", servicesController.getByArea);
-router.get("/:id_branch", servicesController.getByBranch);
+router.get("/branch/:id_branch", servicesController.getByBranch);
+router.get("/:id", servicesController.getById);
 router.post("/", validateService, servicesController.create);
 router.put("/:id", validateServiceUpdate, servicesController.update);
 router.delete("/:id", servicesController.delete);

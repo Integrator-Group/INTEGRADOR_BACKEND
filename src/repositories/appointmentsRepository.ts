@@ -47,6 +47,7 @@ export class AppointmentsRepository {
                 ap.id_user,
                 us.names AS user_names,
                 us.last_names AS user_last_names,
+                us.email AS user_email,
                 pr.names AS pro_names,
                 pr.last_names AS pro_last_names,
                 ap.id_branch,
@@ -56,7 +57,8 @@ export class AppointmentsRepository {
                 ap.start_time,
                 ap.end_time,
                 ap.id_state_appointment,
-                aps.name AS state_name
+                aps.name AS state_name,
+                ap.schedule_date
             FROM ${this.tableName} AS ap
             JOIN users us ON ap.id_user = us.id
             JOIN users pr ON ap.id_professional = pr.id
