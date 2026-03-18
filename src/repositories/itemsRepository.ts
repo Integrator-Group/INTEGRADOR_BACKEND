@@ -12,6 +12,8 @@ export class ItemsRepository {
                 it.id,
                 it.name,
                 it.description,
+                it.price,
+                it.points_price,
                 it.id_state,
                 gs.name AS state_name
             FROM ${this.tableName} AS it
@@ -30,6 +32,8 @@ export class ItemsRepository {
                 it.id,
                 it.name,
                 it.description,
+                it.price,
+                it.points_price,
                 it.id_state,
                 gs.name AS state_name
             FROM ${this.tableName} AS it
@@ -58,11 +62,11 @@ export class ItemsRepository {
         const [result] = await pool.execute<mysql2.ResultSetHeader>(
             `
             INSERT INTO ${this.tableName}
-            (name, description, id_state, created_at)
+            (name, description, id_state, price, points_price, created_at)
             VALUES
-            (?,?,?,NOW())
+            (?,?,?,?,?,NOW())
             `,
-            [ Item.name, Item.description, Item.id_state ]
+            [ Item.name, Item.description, Item.id_state, Item.price, Item.points_price ]
         )
 
         const { insertId } = result;
@@ -91,6 +95,16 @@ export class ItemsRepository {
         if (Item.id_state !== undefined) {
             updates.push('id_state = ?');
             values.push(Item.id_state);
+        }
+
+        if (Item.price !== undefined) {
+            updates.push('price = ?');
+            values.push(Item.price);
+        }
+
+        if (Item.points_price !== undefined) {
+            updates.push('points_price = ?');
+            values.push(Item.points_price);
         }
 
         if (updates.length === 0) {
