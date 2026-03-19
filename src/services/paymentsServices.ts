@@ -50,6 +50,12 @@ export class PaymentsServices {
             const paymentMethod = await this.paymentMethodsRepository.findById(payment.id_method);
 
             if (paymentMethod && isPointsPayment(paymentMethod.name)) {
+                // Regla de negocio: los productos NO se pagan con puntos.
+                const orderType = (appointment.order_type ?? "service") as unknown;
+                if (String(orderType).toLowerCase() === "product") {
+                    throw new Error("No se permite pagar productos con puntos");
+                }
+
                 const pointsToRedeem = Number(payment.amount);
                 if (!Number.isFinite(pointsToRedeem) || pointsToRedeem <= 0) {
                     throw new Error("El monto de puntos debe ser mayor a 0");

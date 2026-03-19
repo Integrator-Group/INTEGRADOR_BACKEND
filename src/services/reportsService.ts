@@ -5,6 +5,9 @@ import {
   RevenueByBranchRow,
   PointsByBranchRow,
   CompletedOrdersByWorkerRow,
+  TopServiceByBranchRow,
+  PeakTrafficByBranchRow,
+  TopWorkerByAreaRow,
 } from "../repositories/reportsRepository";
 
 export class ReportsService {
@@ -72,6 +75,30 @@ export class ReportsService {
     endDate: string
   ): Promise<CompletedOrdersByWorkerRow[]> {
     return this.repo.getCompletedOrdersByWorkerForBranch(id_branch, startDate, endDate);
+  }
+
+  async getTopServicesByBranch(
+    id_branch: number,
+    startDate: string,
+    endDate: string
+  ): Promise<TopServiceByBranchRow[]> {
+    return this.repo.getTopServicesByBranch(id_branch, startDate, endDate);
+  }
+
+  async getPeakTrafficByBranch(
+    id_branch: number,
+    startDate: string,
+    endDate: string
+  ): Promise<PeakTrafficByBranchRow[]> {
+    return this.repo.getPeakTrafficByBranch(id_branch, startDate, endDate);
+  }
+
+  async getTopWorkersByAreaForBranch(
+    id_branch: number,
+    startDate: string,
+    endDate: string
+  ): Promise<TopWorkerByAreaRow[]> {
+    return this.repo.getTopWorkersByAreaForBranch(id_branch, startDate, endDate);
   }
 }
 

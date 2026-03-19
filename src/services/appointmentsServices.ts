@@ -2,7 +2,6 @@ import { AppointmentsRepository } from "../repositories/appointmentsRepository";
 import { PaymentsRepository } from "../repositories/paymentsRepository";
 import { PaymentMethodsRepository } from "../repositories/paymentMethodsRepository";
 import { Appointment, AppointmentCreate, AppointmentUpdate } from "../models/Appointments";
-import { ServicesRepository } from "../repositories/servicesRepository";
 import { CustomerLoyaltyService } from "./customerLoyaltyService";
 
 const REVERSED_PAYMENT_STATUS_ID = 4;
@@ -26,14 +25,12 @@ function isCashPayment(methodName: string): boolean {
 
 export class AppointmentsServices {
     private readonly appointmentsRepository: AppointmentsRepository;
-    private readonly servicesRepository: ServicesRepository;
     private readonly customerLoyaltyService: CustomerLoyaltyService;
     private readonly paymentsRepository: PaymentsRepository;
     private readonly paymentMethodsRepository: PaymentMethodsRepository;
 
     constructor() {
         this.appointmentsRepository = new AppointmentsRepository();
-        this.servicesRepository = new ServicesRepository();
         this.customerLoyaltyService = new CustomerLoyaltyService();
         this.paymentsRepository = new PaymentsRepository();
         this.paymentMethodsRepository = new PaymentMethodsRepository();
@@ -83,11 +80,16 @@ export class AppointmentsServices {
         return this.appointmentsRepository.findAllByBranch(id_branch, startDate, endDate);
     }
 
+    async getAllOrdersByBranchWithItems(
+        id_branch: number,
+        startDate: string,
+        endDate: string
+    ): Promise<any> {
+        return this.appointmentsRepository.findAllOrdersByBranchWithItems(id_branch, startDate, endDate);
+    }
+
     async createAppointment(appointment: AppointmentCreate): Promise<Appointment> {
         try {
-            const service = await this.servicesRepository.findServiceById(Number(appointment.id_service));
-            if (!service) throw new Error("Servicio no encontrado");
-
             return await this.appointmentsRepository.create(appointment);
         } catch (error) {
             if (error instanceof Error) {

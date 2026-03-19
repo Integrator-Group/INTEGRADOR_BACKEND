@@ -31,6 +31,27 @@ export type CompletedOrdersByWorkerRow = {
   total_completed_orders: number;
 };
 
+export type TopServiceByBranchRow = {
+  id_service: number;
+  service_name: string;
+  total_appointments: number;
+};
+
+export type PeakTrafficByBranchRow = {
+  day: string;
+  hour: number;
+  total_appointments: number;
+};
+
+export type TopWorkerByAreaRow = {
+  id_area: number;
+  area_name: string;
+  id_professional: number;
+  professional_names: string;
+  professional_last_names: string | null;
+  total_appointments: number;
+};
+
 export class ReportsRepository {
   private readonly REVERSED_PAYMENT_STATUS_ID = 4;
   private readonly COMPLETED_APPOINTMENT_STATUS_ID = 2;
@@ -331,6 +352,112 @@ export class ReportsRepository {
       professional_names: String(r.professional_names),
       professional_last_names: r.professional_last_names === null ? null : String(r.professional_last_names),
       total_completed_orders: Number(r.total_completed_orders),
+    }));
+  }
+
+  async getTopServicesByBranch(
+    id_branch: number,
+    startDate: string,
+    endDate: string
+  ): Promise<TopServiceByBranchRow[]> {
+    const [rows] = await pool.execute<any[]>(
+      `
+      SELECT
+        se.id AS id_service,
+        se.name AS service_name,
+        COUNT(*) AS total_appointments
+      FROM appointments ap
+      JOIN services se ON ap.id_service = se.id
+      WHERE
+        ap.id_branch = ?
+        AND ap.schedule_date >= ?
+        AND ap.schedule_date <= ?
+      GROUP BY se.id, se.name
+      ORDER BY total_appointments DESC, se.name ASC
+      `,
+      [id_branch, startDate, endDate]
+    );
+
+    return rows.map((r) => ({
+      id_service: Number(r.id_service),
+      service_name: String(r.service_name),
+      total_appointments: Number(r.total_appointments),
+    }));
+  }
+
+  async getPeakTrafficByBranch(
+    id_branch: number,
+    startDate: string,
+    endDate: string
+  ): Promise<PeakTrafficByBranchRow[]> {
+    const [rows] = await pool.execute<any[]>(
+      `
+      SELECT
+        DATE_FORMAT(ap.schedule_date, '%Y-%m-%d') AS day,
+        HOUR(ap.start_time) AS hour,
+        COUNT(*) AS total_appointments
+      FROM appointments ap
+      WHERE
+        ap.id_branch = ?
+        AND ap.schedule_date >= ?
+        AND ap.schedule_date <= ?
+      GROUP BY DATE_FORMAT(ap.schedule_date, '%Y-%m-%d'), HOUR(ap.start_time)
+      ORDER BY total_appointments DESC, day ASC, hour ASC
+      `,
+      [id_branch, startDate, endDate]
+    );
+
+    return rows.map((r) => ({
+      day: String(r.day),
+      hour: Number(r.hour),
+      total_appointments: Number(r.total_appointments),
+    }));
+  }
+
+  async getTopWorkersByAreaForBranch(
+    id_branch: number,
+    startDate: string,
+    endDate: string
+  ): Promise<TopWorkerByAreaRow[]> {
+    const [rows] = await pool.execute<any[]>(
+      `
+      SELECT
+        ar.id AS id_area,
+        ar.name AS area_name,
+        pr.id AS id_professional,
+        pr.names AS professional_names,
+        pr.last_names AS professional_last_names,
+        COUNT(*) AS total_appointments
+      FROM appointments ap
+      JOIN services se ON ap.id_service = se.id
+      JOIN areas ar ON se.id_area = ar.id
+      JOIN users pr ON ap.id_professional = pr.id
+      WHERE
+        ap.id_branch = ?
+        AND ap.schedule_date >= ?
+        AND ap.schedule_date <= ?
+      GROUP BY
+        ar.id,
+        ar.name,
+        pr.id,
+        pr.names,
+        pr.last_names
+      ORDER BY
+        ar.name ASC,
+        total_appointments DESC,
+        pr.names ASC,
+        pr.last_names ASC
+      `,
+      [id_branch, startDate, endDate]
+    );
+
+    return rows.map((r) => ({
+      id_area: Number(r.id_area),
+      area_name: String(r.area_name),
+      id_professional: Number(r.id_professional),
+      professional_names: String(r.professional_names),
+      professional_last_names: r.professional_last_names === null ? null : String(r.professional_last_names),
+      total_appointments: Number(r.total_appointments),
     }));
   }
 }

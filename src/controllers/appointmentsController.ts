@@ -278,6 +278,48 @@ export class AppointmentsController {
         }
     }
 
+    // Listado por sucursal con orden_items (productos comprados) y filtro por schedule_date
+    getAllOrdersByBranchWithItems = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id_branch = parseInt(req.params.id_branch, 10);
+            if (isNaN(id_branch)) {
+                res.status(400).json({
+                    success: false,
+                    message: 'ID de sucursal inválido'
+                });
+                return;
+            }
+
+            const startDate = req.query.startDate as string | undefined;
+            const endDate = req.query.endDate as string | undefined;
+
+            if (!startDate || !endDate) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Los parámetros startDate y endDate son requeridos'
+                });
+                return;
+            }
+
+            const data = await this.appointmentsServices.getAllOrdersByBranchWithItems(
+                id_branch,
+                startDate,
+                endDate
+            );
+
+            res.status(200).json({
+                success: true,
+                data
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener las órdenes de la sucursal',
+                error: error instanceof Error ? error.message : 'Error desconocido'
+            });
+        }
+    };
+
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req);
