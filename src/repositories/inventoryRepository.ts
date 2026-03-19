@@ -38,6 +38,8 @@ export class InventoryRepository {
                 br.name AS branch_name,
                 inv.quantity,
                 inv.min_stock,
+                it.price AS item_price,
+                it.points_price AS item_points_price,
                 inv.created_at,
                 inv.updated_at
             FROM ${this.tableName} AS inv
@@ -62,6 +64,8 @@ export class InventoryRepository {
                 inv.quantity,
                 inv.min_stock,
                 it.description AS item_description,
+                it.price AS item_price,
+                it.points_price AS item_points_price,
                 inv.created_at,
                 inv.updated_at
             FROM ${this.tableName} AS inv
@@ -85,6 +89,8 @@ export class InventoryRepository {
                 inv.id_branch,
                 br.name AS branch_name,
                 inv.quantity,
+                it.price AS item_price,
+                it.points_price AS item_points_price,
                 inv.min_stock,
                 it.description AS item_description,
                 inv.created_at,

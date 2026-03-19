@@ -26,5 +26,10 @@ router.get("/branch/:id_branch/revenue-by-branch", controller.getRevenueByBranch
 router.get("/branch/:id_branch/points-by-branch", controller.getPointsByBranchForBranch);
 router.get("/branch/:id_branch/completed-orders-by-worker", controller.getCompletedOrdersByWorkerForBranch);
 
+// Nuevos reportes analíticos por sucursal
+router.get("/branch/:id_branch/top-services", controller.getTopServicesByBranch);
+router.get("/branch/:id_branch/peak-traffic", controller.getPeakTrafficByBranch);
+router.get("/branch/:id_branch/top-workers-by-area", controller.getTopWorkersByAreaForBranch);
+
 export default router;
 

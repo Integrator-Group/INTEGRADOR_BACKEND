@@ -10,6 +10,9 @@ router.get('/', appointmentsController.getAll);
 // Listado por sucursal (con filtro opcional ?schedule_date=YYYY-MM-DD)
 router.get('/branch/:id_branch', appointmentsController.getAllByBranch);
 
+// Listado por sucursal con orden_items (productos comprados) + filtro por fechas
+router.get('/branch/:id_branch/orders-with-items', appointmentsController.getAllOrdersByBranchWithItems);
+
 // Listado para Usuarios
 router.get('/user/:id_user', appointmentsController.getAllByUser)
 router.get('/scheduled/user/:id_user', appointmentsController.getScheduledByUser)

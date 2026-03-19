@@ -16,6 +16,14 @@ export interface UserOrderBranchInfo {
   name: string;
 }
 
+export interface UserOrderProductInfo {
+  product_id: number;
+  product_name: string | null;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+}
+
 export interface UserOrderPaymentInfo {
   amount: number;
   method: string;
@@ -31,14 +39,16 @@ export interface UserOrderRatingInfo {
 
 export interface UserOrderPaymentView {
   appointment_id: number;
+  order_type: string;
   order_number: string;
   schedule_date: string;
   start_time: string;
   end_time: string;
   status: string;
-  service: UserOrderServiceInfo;
-  professional: UserOrderProfessionalInfo;
+  service: UserOrderServiceInfo | null;
+  professional: UserOrderProfessionalInfo | null;
   branch: UserOrderBranchInfo;
+  products: UserOrderProductInfo[] | null;
   payment: UserOrderPaymentInfo | null;
   rating: UserOrderRatingInfo | null;
 }

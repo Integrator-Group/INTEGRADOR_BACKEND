@@ -720,29 +720,11 @@ export const validateAppointments = [
     .isInt()
     .withMessage('El ID del usuario debe ser un número entero'),
 
-  body('id_professional')
-    .notEmpty()
-    .withMessage('El ID del profesional es requerido')
-    .isInt()
-    .withMessage('El ID del profesional debe ser un número entero'),
-
   body('id_branch')
     .notEmpty()
     .withMessage('El ID de la sucursal es requerido')
     .isInt()
     .withMessage('El ID de la sucursal debe ser un número entero'),
-
-  body('id_service')
-    .notEmpty()
-    .withMessage('El ID del servicio es requerido')
-    .isInt()
-    .withMessage('El ID del servicio debe ser un número entero'),
-    
-  body('id_schedule')
-    .notEmpty()
-    .withMessage('El ID del horario es requerido')
-    .isInt()
-    .withMessage('El ID del horario debe ser un número entero'),
 
   body('start_time')
     .notEmpty()
@@ -757,6 +739,87 @@ export const validateAppointments = [
     .withMessage('La fecha de agendamiento es requerida')
     .matches(/^\d{4}-\d{2}-\d{2}$/)
     .withMessage('La fecha de agendamiento debe tener formato YYYY-MM-DD'),
+
+  body('order_type')
+    .optional()
+    .isIn(['service', 'product'])
+    .withMessage('El order_type debe ser "service" o "product"'),
+
+  // Para ordenes PRODUCT no existe profesional ni servicio,
+  // pero para ordenes SERVICE sí se requieren.
+  body('id_professional')
+    .custom((value, { req }) => {
+      const orderType = (req.body.order_type ?? 'service') as string;
+      if (String(orderType).toLowerCase() === 'product') {
+        // En PRODUCT no debe importar si viene null o vacío.
+        if (value === undefined || value === null || value === '') return true;
+      }
+
+      if (value === undefined || value === null || value === '') {
+        throw new Error('El ID del profesional es requerido');
+      }
+
+      const num = Number(value);
+      if (!Number.isFinite(num) || !Number.isInteger(num)) {
+        throw new Error('El ID del profesional debe ser un número entero');
+      }
+
+      return true;
+    }),
+
+  body('id_service')
+    .custom((value, { req }) => {
+      const orderType = (req.body.order_type ?? 'service') as string;
+      if (String(orderType).toLowerCase() === 'product') {
+        // En PRODUCT no debe importar si viene null o vacío.
+        if (value === undefined || value === null || value === '') return true;
+      }
+
+      if (value === undefined || value === null || value === '') {
+        throw new Error('El ID del servicio es requerido');
+      }
+
+      const num = Number(value);
+      if (!Number.isFinite(num) || !Number.isInteger(num)) {
+        throw new Error('El ID del servicio debe ser un número entero');
+      }
+
+      return true;
+    }),
+
+  body('products')
+    .optional()
+    .isArray()
+    .withMessage('products debe ser un arreglo')
+    .custom((value, { req }) => {
+      const orderType = String(req.body.order_type ?? 'service').toLowerCase();
+      if (orderType === 'product') {
+        if (!Array.isArray(value) || value.length === 0) {
+          throw new Error('products es requerido para order_type product');
+        }
+      }
+      return true;
+    }),
+
+  body('products.*.product_item')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('product_item debe ser un entero positivo'),
+
+  body('products.*.quantity')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('quantity debe ser un entero positivo'),
+
+  body('products.*.product_price')
+    .optional()
+    .isDecimal()
+    .withMessage('product_price debe ser numérico'),
+
+  body('products.*.product_points_price')
+    .optional()
+    .isDecimal()
+    .withMessage('product_points_price debe ser numérico'),
 ]
 
 export const validatePayments = [

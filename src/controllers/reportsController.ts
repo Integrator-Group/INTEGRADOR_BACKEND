@@ -249,5 +249,71 @@ export class ReportsController {
       });
     }
   };
+
+  getTopServicesByBranch = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const id_branch = parseInt(req.params.id_branch, 10);
+      if (isNaN(id_branch)) {
+        res.status(400).json({ success: false, message: "ID de sucursal inválido" });
+        return;
+      }
+      const { startDate, endDate } = resolveDateRange(
+        req.query.startDate as string | undefined,
+        req.query.endDate as string | undefined
+      );
+      const data = await this.service.getTopServicesByBranch(id_branch, startDate, endDate);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error al obtener el reporte de servicios más agendados",
+        error: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  };
+
+  getPeakTrafficByBranch = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const id_branch = parseInt(req.params.id_branch, 10);
+      if (isNaN(id_branch)) {
+        res.status(400).json({ success: false, message: "ID de sucursal inválido" });
+        return;
+      }
+      const { startDate, endDate } = resolveDateRange(
+        req.query.startDate as string | undefined,
+        req.query.endDate as string | undefined
+      );
+      const data = await this.service.getPeakTrafficByBranch(id_branch, startDate, endDate);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error al obtener el reporte de mayor frecuencia de clientes",
+        error: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  };
+
+  getTopWorkersByAreaForBranch = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const id_branch = parseInt(req.params.id_branch, 10);
+      if (isNaN(id_branch)) {
+        res.status(400).json({ success: false, message: "ID de sucursal inválido" });
+        return;
+      }
+      const { startDate, endDate } = resolveDateRange(
+        req.query.startDate as string | undefined,
+        req.query.endDate as string | undefined
+      );
+      const data = await this.service.getTopWorkersByAreaForBranch(id_branch, startDate, endDate);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error al obtener el reporte de trabajadores más solicitados por área",
+        error: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  };
 }
 
